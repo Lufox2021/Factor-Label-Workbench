@@ -1,0 +1,1493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Factor-Label Workbench</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a lab-notebook bench — header strip with tabs, then a problem card above a horizontal factor chain that wraps on phones. */
+:root {
+  --paper: #F2F5F2; --card: #FFFFFF; --ink: #1A2420; --muted: #5A6A62; --line: #C9D3CD; --soft: #E6ECE8;
+  --accent: #1C5E8A; --accent-ink: #FFFFFF; --cancel: #C2382A; --ok: #2B7A4B; --ok-bg: #E3F2E8;
+  --bad-bg: #FBE7E4; --warn: #9A5B00; --warn-bg: #FBF0DC; --info-bg: #E5EEF5;
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #111614; --card: #1A211E; --ink: #E2EAE5; --muted: #95A59D; --line: #33403A; --soft: #232C28;
+  --accent: #7CB6DE; --accent-ink: #0C1A24; --cancel: #F08273; --ok: #72C595; --ok-bg: #1B3326;
+  --bad-bg: #3A1F1B; --warn: #E3AC52; --warn-bg: #36290F; --info-bg: #1A2A36; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #111614; --card: #1A211E; --ink: #E2EAE5; --muted: #95A59D; --line: #33403A; --soft: #232C28;
+  --accent: #7CB6DE; --accent-ink: #0C1A24; --cancel: #F08273; --ok: #72C595; --ok-bg: #1B3326;
+  --bad-bg: #3A1F1B; --warn: #E3AC52; --warn-bg: #36290F; --info-bg: #1A2A36; color-scheme: dark; }
+
+[hidden] { display: none !important; }
+body { background: var(--paper); color: var(--ink); font: 16px/1.5 var(--f-body); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { border-bottom: 1px solid var(--line); background: var(--card); }
+header .wrap { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; padding-block: 18px 0; }
+h1 { font: 750 clamp(1.5rem, 3.6vw, 2.1rem)/1.1 var(--f-display); font-stretch: 85%; letter-spacing: -0.01em; margin: 0 0 4px; text-wrap: balance; }
+h1 .x { color: var(--cancel); font-stretch: 100%; padding: 0 0.06em; }
+.tag { color: var(--muted); font-size: 0.92rem; margin: 0 0 14px; }
+nav.tabs { display: flex; gap: 4px; align-self: end; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+nav.tabs button { white-space: nowrap; flex: none; }
+nav.tabs button { font: 650 0.95rem var(--f-display); font-stretch: 95%; letter-spacing: 0.02em; background: none; border: 0; border-bottom: 3px solid transparent; color: var(--muted); padding: 10px 14px 9px; cursor: pointer; }
+nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+nav.tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+main { padding-block: 22px 48px; }
+.panel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.bar select { flex: 1 1 220px; max-width: 100%; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+label.lbl { font: 600 0.72rem var(--f-display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+select, input[type=text], textarea { font: inherit; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; min-width: 0; }
+textarea { width: 100%; resize: vertical; }
+select:focus-visible, input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.btn { font: 650 0.92rem var(--f-display); font-stretch: 95%; letter-spacing: 0.01em; border-radius: 6px; padding: 9px 16px; cursor: pointer; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.quiet { border-color: transparent; background: none; color: var(--accent); padding-inline: 8px; }
+.btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+.problem { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: grid; gap: 6px; }
+.problem .topic { font: 600 0.72rem var(--f-display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.problem p { margin: 0; max-width: 68ch; font-size: 1.05rem; }
+.problem .meta { color: var(--muted); font-size: 0.9rem; font-family: var(--f-mono); }
+
+/* the chain */
+.chain { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 8px; padding: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  background-image: linear-gradient(var(--soft) 1px, transparent 1px), linear-gradient(90deg, var(--soft) 1px, transparent 1px); background-size: 22px 22px; background-position: -1px -1px; }
+.op { font: 400 1.4rem var(--f-mono); color: var(--muted); padding: 0 2px; }
+.box { display: grid; gap: 6px; justify-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; position: relative; }
+.box .cap { font: 600 0.66rem var(--f-display); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.box.start, .box.target { border-style: solid; border-width: 1.5px; }
+.box.target { border-color: var(--accent); }
+.box input[type=text] { font-family: var(--f-mono); font-size: 0.95rem; text-align: center; width: 9.5em; }
+.box.start input[type=text] { width: 9em; }
+.box.target input[type=text] { width: 7em; }
+.frac { display: grid; grid-template-columns: auto; gap: 0; justify-items: center; }
+.frac .row { display: flex; align-items: center; gap: 6px; padding: 4px 2px; }
+.frac .rule { height: 2px; background: var(--ink); width: 100%; border-radius: 1px; }
+.frac input.u { width: 7.5em; }
+.frac input.n { width: 6.5em; }
+.factor { padding-right: 34px; }
+.factor .pow { position: absolute; top: 6px; right: 6px; font: 600 0.75rem var(--f-mono); padding: 1px 2px; border-radius: 4px; color: var(--muted); background: transparent; border: 1px dashed var(--line); width: 2.8em; -webkit-appearance: none; appearance: none; text-align: center; text-align-last: center; cursor: pointer; }
+.factor .pow.on { color: var(--accent-ink); background: var(--accent); border: 1px solid var(--accent); }
+.factor .rm { position: absolute; bottom: 4px; right: 4px; border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 1rem; line-height: 1; padding: 4px 6px; border-radius: 4px; }
+.factor .rm:hover { color: var(--cancel); }
+.factor .idx { position: absolute; top: 6px; left: 8px; font: 600 0.66rem var(--f-mono); color: var(--muted); }
+.factor.ok { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.factor.bad { border-color: var(--cancel); box-shadow: inset 0 0 0 1px var(--cancel); }
+.factor.unknown { border-color: var(--warn); }
+.factor.current { border-color: var(--accent); border-style: dashed; }
+.paren { display: flex; align-items: center; }
+.paren > .bk { font: 300 3.6rem/1 var(--f-mono); color: var(--muted); margin-top: -6px; }
+.paren > sup { font: 600 1rem var(--f-mono); color: var(--accent); align-self: start; }
+.tok { font: 500 1rem var(--f-mono); white-space: nowrap; }
+.tok.x { color: var(--cancel); text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: var(--cancel); }
+.tok .lab { font-size: 0.92em; }
+.tok.x { opacity: 0.85; }
+.val { font: 600 1rem var(--f-mono); }
+.answer { font: 700 1.35rem var(--f-mono); color: var(--ok); text-align: center; }
+.answer small { display: block; font: 400 0.72rem var(--f-body); color: var(--muted); }
+.addf { border: 1.5px dashed var(--line); background: none; color: var(--accent); border-radius: 8px; padding: 18px 12px; cursor: pointer; font: 650 0.85rem var(--f-display); }
+.addf:hover { border-color: var(--accent); }
+.reveal { font: 400 0.8rem var(--f-mono); color: var(--warn); }
+
+.msgs { display: grid; gap: 8px; }
+.msg { border-radius: 8px; padding: 10px 14px; max-width: 80ch; border-left: 4px solid; }
+.msg.ok { background: var(--ok-bg); border-color: var(--ok); }
+.msg.bad { background: var(--bad-bg); border-color: var(--cancel); }
+.msg.warn { background: var(--warn-bg); border-color: var(--warn); }
+.msg.info { background: var(--info-bg); border-color: var(--accent); }
+.msg code, .help code { font-family: var(--f-mono); font-size: 0.92em; }
+
+.score { display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.92rem; color: var(--muted); }
+.score b { font: 700 1.05rem var(--f-mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+.help { color: var(--muted); font-size: 0.9rem; max-width: 80ch; }
+.help summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.help ul { margin: 6px 0 0; padding-left: 20px; }
+
+/* bank */
+.grid2 { align-items: start; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field .note { font-size: 0.82rem; color: var(--muted); }
+.list { display: grid; gap: 8px; }
+.item { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; }
+.item .t { min-width: 0; }
+.item .t p { margin: 0; }
+.item .m { font: 400 0.82rem var(--f-mono); color: var(--muted); }
+.item.hidden-b { opacity: 0.55; }
+.pill { display: inline-block; font: 600 0.66rem var(--f-display); letter-spacing: 0.07em; text-transform: uppercase; padding: 2px 7px; border-radius: 99px; background: var(--soft); color: var(--muted); margin-right: 6px; }
+.pill.mine { background: var(--info-bg); color: var(--accent); }
+h2 { font: 700 1.15rem var(--f-display); font-stretch: 90%; margin: 8px 0 0; }
+.empty { color: var(--muted); font-style: italic; }
+.filebtn { position: relative; overflow: hidden; }
+.filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.filebtn:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pill.okp { background: var(--ok-bg); color: var(--ok); }
+.pill.badp { background: var(--bad-bg); color: var(--cancel); }
+.notes { margin: 6px 0 0; padding-left: 18px; font-size: 0.88rem; }
+.notes .e { color: var(--cancel); }
+.notes .w { color: var(--warn); }
+@media (max-width: 520px) { .chain { padding: 12px; } .box input[type=text] { width: 8em; } .frac input.u { width: 6.5em; } .frac input.n { width: 5.5em; } }
+@media (prefers-reduced-motion: no-preference) { .msg { animation: in .18s ease-out; } @keyframes in { from { transform: translateY(-3px); opacity: .4; } } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div>
+      <h1>Factor<span class="x">–</span>Label Workbench</h1>
+      <p class="tag">Build the units first. When they cancel, the numbers unlock.</p>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" id="tab-solve" aria-selected="true" data-tab="solve">Solve &amp; Check</button>
+      <button role="tab" id="tab-tutor" aria-selected="false" data-tab="tutor">Tutor</button>
+      <button role="tab" id="tab-calc" aria-selected="false" data-tab="calc">FL Calculator</button>
+      <button role="tab" id="tab-bank" aria-selected="false" data-tab="bank" hidden>Problem Bank</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+
+  <section class="panel" id="p-solve">
+    <div class="bar">
+      <label class="lbl" for="solve-pick">Problem</label>
+      <select id="solve-pick"></select>
+    </div>
+    <div id="solve-problem"></div>
+    <div id="solve-chain"></div>
+    <details class="help">
+      <summary>How to type units</summary>
+      <ul>
+        <li>Powers: <code>cm^3</code>, <code>cm3</code> or <code>cm³</code>. Rates: <code>mi/h</code>, <code>m/s^2</code>, <code>g/mL</code>.</li>
+        <li>Name the substance after the unit: <code>g NaCl</code>, <code>mol H2O</code>, <code>molecules CO2</code>, <code>L solution</code>.</li>
+        <li>Big and small numbers: <code>6.022e23</code> or <code>6.022x10^23</code>.</li>
+        <li>To raise a whole factor to a power (for squared or cubed units), use the small <code>^1</code> box in its corner. Leave it at 1 unless the units call for more.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="panel" id="p-tutor" hidden>
+    <div class="bar">
+      <label class="lbl" for="tutor-topic">Topic</label>
+      <select id="tutor-topic"></select>
+      <button class="btn" id="tutor-next">Next problem</button>
+      <div class="score" id="tutor-score" style="margin-left:auto"></div>
+    </div>
+    <div id="tutor-problem"></div>
+    <div id="tutor-chain"></div>
+  </section>
+
+  <section class="panel" id="p-calc" hidden>
+    <p class="help" style="margin:0">Work your own problem. Type the starting quantity and the target units, then build the conversion one factor at a time. Each step is checked as you go.</p>
+    <div class="field" style="max-width:640px">
+      <label class="lbl" for="calc-given">Given data from your problem (optional)</label>
+      <input type="text" id="calc-given" placeholder="1.84 g = 1 mL; 0.100 mol NaOH = 1 L solution" autocomplete="off" spellcheck="false">
+      <span class="note">Densities, concentrations or percentages stated in the problem, separated by semicolons. Standard conversions, molar masses and Avogadro's number are built in.</span>
+    </div>
+    <div id="calc-chain"></div>
+  </section>
+
+  <section class="panel" id="p-bank" hidden>
+    <div class="msg info">Only you see this tab. Write the problem, then work the solution in the chain below. The problem saves once every factor checks out, and students see it right away in both modules.</div>
+    <h2 id="bank-h">New problem</h2>
+    <div class="grid2">
+      <div class="field" style="grid-column: 1 / -1">
+        <label class="lbl" for="b-prompt">Problem statement</label>
+        <textarea id="b-prompt" rows="2" placeholder="Concentrated sulfuric acid has a density of 1.84 g/mL. What is the mass, in kg, of 2.50 L?"></textarea>
+      </div>
+      <div class="field">
+        <label class="lbl" for="b-topic">Topic</label>
+        <input type="text" id="b-topic" list="topics" placeholder="Density">
+        <datalist id="topics"></datalist>
+      </div>
+      <div class="field">
+        <label class="lbl" for="b-equation">Balanced equation (stoichiometry only)</label>
+        <input type="text" id="b-equation" placeholder="2 H2 + O2 -> 2 H2O">
+      </div>
+      <div class="field">
+        <label class="lbl" for="b-given">Given relationships, one per line</label>
+        <textarea id="b-given" rows="2" placeholder="1.84 g H2SO4 = 1 mL H2SO4"></textarea>
+        <span class="note">For data stated in the problem (density, molarity, percent). Standard conversions, molar masses and Avogadro's number are built in.</span>
+      </div>
+      <div class="field">
+        <label class="lbl" for="b-hint">Hint for students (optional)</label>
+        <textarea id="b-hint" rows="2" placeholder="Convert liters to milliliters first, then use the density."></textarea>
+      </div>
+    </div>
+    <div>
+      <label class="lbl">Worked solution</label>
+      <div id="bank-chain" style="margin-top:6px"></div>
+    </div>
+    <div class="bar">
+      <button class="btn primary" id="b-save" disabled>Save problem</button>
+      <button class="btn" id="b-clear">Clear form</button>
+      <span id="b-status" class="help"></span>
+    </div>
+    <h2>Upload problems</h2>
+    <div class="panel" style="gap:10px">
+      <p class="help" style="margin:0">Add many problems at once from an Excel (.xlsx) or CSV file, one problem per row. The first row names the columns: <code>prompt</code>, <code>topic</code>, <code>start</code>, <code>target</code>, <code>solution</code>, and optionally <code>given</code>, <code>equation</code>, <code>hint</code>. Separate the solution's factors with semicolons, as in <code>1609 m / 1 mi; 1 h / 3600 s</code>, and write a power as <code>(2.54 cm / 1 in)^3</code>. Every row is checked before anything is saved.</p>
+      <div class="bar">
+        <label class="btn primary filebtn" for="u-file">Choose file…<input type="file" id="u-file" accept=".xlsx,.xls,.csv"></label>
+        <button class="btn" id="u-template" hidden>Download template</button>
+        <span id="u-name" class="help"></span>
+      </div>
+      <div id="u-preview" class="list"></div>
+      <div class="bar" id="u-actions" hidden><button class="btn primary" id="u-import">Import</button><span id="u-status" class="help"></span></div>
+    </div>
+    <h2>Your problems</h2>
+    <div class="list" id="bank-mine"></div>
+    <h2>Built-in starter set</h2>
+    <p class="help" style="margin:0">Hide any you don't want students to see.</p>
+    <div class="list" id="bank-builtin"></div>
+  </section>
+</main>
+<script>
+/* ===== Unit engine ===== */
+const UE = (() => {
+  // dims: [length m, mass g, time s, amount mol, count]
+  const Dm = (m = 0, g = 0, s = 0, mol = 0, n = 0) => [m, g, s, mol, n];
+  const NA = 6.02214076e23;
+  const BASE = {
+    m: { f: 1, d: Dm(1) }, g: { f: 1, d: Dm(0, 1) }, s: { f: 1, d: Dm(0, 0, 1) },
+    L: { f: 1e-3, d: Dm(3) }, mol: { f: 1, d: Dm(0, 0, 0, 1) },
+    J: { f: 1000, d: Dm(2, 1, -2) }, cal: { f: 4184, d: Dm(2, 1, -2) },
+    Pa: { f: 1000, d: Dm(-1, 1, -2) }, W: { f: 1000, d: Dm(2, 1, -3) }
+  };
+  const GAL = 3.785411784e-3;
+  const OTHER = {
+    in: { f: 0.0254, d: Dm(1) }, ft: { f: 0.3048, d: Dm(1) }, yd: { f: 0.9144, d: Dm(1) },
+    mi: { f: 1609.344, d: Dm(1) }, "Å": { f: 1e-10, d: Dm(1) },
+    lb: { f: 453.59237, d: Dm(0, 1) }, oz: { f: 28.349523125, d: Dm(0, 1) },
+    ton: { f: 907184.74, d: Dm(0, 1) }, t: { f: 1e6, d: Dm(0, 1) },
+    amu: { f: 1.66053906660e-24, d: Dm(0, 1) },
+    min: { f: 60, d: Dm(0, 0, 1) }, h: { f: 3600, d: Dm(0, 0, 1) },
+    day: { f: 86400, d: Dm(0, 0, 1) }, wk: { f: 604800, d: Dm(0, 0, 1) },
+    yr: { f: 365.25 * 86400, d: Dm(0, 0, 1) },
+    gal: { f: GAL, d: Dm(3) }, qt: { f: GAL / 4, d: Dm(3) }, pt: { f: GAL / 8, d: Dm(3) },
+    cup: { f: GAL / 16, d: Dm(3) }, floz: { f: GAL / 128, d: Dm(3) },
+    tbsp: { f: GAL / 256, d: Dm(3) }, tsp: { f: GAL / 768, d: Dm(3) },
+    cc: { f: 1e-6, d: Dm(3) },
+    atm: { f: 101325e3, d: Dm(-1, 1, -2) }, torr: { f: 101325e3 / 760, d: Dm(-1, 1, -2) },
+    mmHg: { f: 133.322387415e3, d: Dm(-1, 1, -2) }, psi: { f: 6894.757293e3, d: Dm(-1, 1, -2) },
+    bar: { f: 1e8, d: Dm(-1, 1, -2) }, Cal: { f: 4184e3, d: Dm(2, 1, -2) },
+    atoms: { f: 1, d: Dm(0, 0, 0, 0, 1) }, molecules: { f: 1, d: Dm(0, 0, 0, 0, 1) },
+    ions: { f: 1, d: Dm(0, 0, 0, 0, 1) }, particles: { f: 1, d: Dm(0, 0, 0, 0, 1) },
+    "formula units": { f: 1, d: Dm(0, 0, 0, 0, 1) }
+  };
+  const ALIAS = {
+    hr: "h", hrs: "h", hour: "h", hours: "h", sec: "s", secs: "s", second: "s", seconds: "s",
+    mins: "min", minute: "min", minutes: "min", days: "day", d: "day", week: "wk", weeks: "wk",
+    year: "yr", years: "yr", y: "yr", lbs: "lb", pound: "lb", pounds: "lb", ounce: "oz", ounces: "oz",
+    tons: "ton", inch: "in", inches: "in", foot: "ft", feet: "ft", yard: "yd", yards: "yd",
+    mile: "mi", miles: "mi", gallon: "gal", gallons: "gal", quart: "qt", quarts: "qt",
+    pint: "pt", pints: "pt", cups: "cup", "fl-oz": "floz", "fl.oz": "floz", Torr: "torr",
+    "mm-Hg": "mmHg", u: "amu", Da: "amu", A: "Å", angstrom: "Å",
+    atom: "atoms", molecule: "molecules", ion: "ions", particle: "particles", fu: "formula units",
+    l: "L", ml: "mL", dl: "dL", cl: "cL", kl: "kL", ul: "μL", "μl": "μL", "µl": "μL",
+    moles: "mol", mole: "mol", grams: "g", gram: "g", meter: "m", meters: "m", liter: "L", liters: "L"
+  };
+  const PREFIX = [["da", 10], ["T", 1e12], ["G", 1e9], ["M", 1e6], ["k", 1e3], ["h", 1e2], ["d", 0.1],
+    ["c", 0.01], ["m", 1e-3], ["μ", 1e-6], ["µ", 1e-6], ["u", 1e-6], ["n", 1e-9], ["p", 1e-12], ["f", 1e-15]];
+
+  function lookup(tok) {
+    if (ALIAS[tok]) tok = ALIAS[tok];
+    if (BASE[tok]) return { sym: tok, ...BASE[tok] };
+    if (OTHER[tok]) return { sym: tok, ...OTHER[tok] };
+    for (const [p, v] of PREFIX) {
+      if (tok.length > p.length && tok.startsWith(p)) {
+        const rest = tok.slice(p.length);
+        if (BASE[rest]) {
+          const pp = (p === "u" || p === "µ") ? "μ" : p;
+          return { sym: pp + rest, f: v * BASE[rest].f, d: BASE[rest].d };
+        }
+      }
+    }
+    return null;
+  }
+
+  // ---- chemistry ----
+  const AW = { H: 1.008, He: 4.0026, Li: 6.94, Be: 9.0122, B: 10.81, C: 12.011, N: 14.007, O: 15.999, F: 18.998, Ne: 20.180,
+    Na: 22.990, Mg: 24.305, Al: 26.982, Si: 28.085, P: 30.974, S: 32.06, Cl: 35.45, Ar: 39.948, K: 39.098, Ca: 40.078,
+    Sc: 44.956, Ti: 47.867, V: 50.942, Cr: 51.996, Mn: 54.938, Fe: 55.845, Co: 58.933, Ni: 58.693, Cu: 63.546, Zn: 65.38,
+    Ga: 69.723, Ge: 72.630, As: 74.922, Se: 78.971, Br: 79.904, Kr: 83.798, Rb: 85.468, Sr: 87.62, Y: 88.906, Zr: 91.224,
+    Nb: 92.906, Mo: 95.95, Tc: 98, Ru: 101.07, Rh: 102.91, Pd: 106.42, Ag: 107.87, Cd: 112.41, In: 114.82, Sn: 118.71,
+    Sb: 121.76, Te: 127.60, I: 126.90, Xe: 131.29, Cs: 132.91, Ba: 137.33, La: 138.91, Ce: 140.12, Pr: 140.91, Nd: 144.24,
+    Sm: 150.36, Eu: 151.96, Gd: 157.25, Hf: 178.49, Ta: 180.95, W: 183.84, Re: 186.21, Os: 190.23, Ir: 192.22, Pt: 195.08,
+    Au: 196.97, Hg: 200.59, Tl: 204.38, Pb: 207.2, Bi: 208.98, Po: 209, At: 210, Rn: 222, Ra: 226, Th: 232.04, U: 238.03, Pu: 244 };
+
+  function molarMass(formula) {
+    if (!formula) return null;
+    const f = formula.replace(/\s+/g, "");
+    const parts = f.split(/[·•*.]/);
+    let total = 0;
+    for (let part of parts) {
+      let mult = 1;
+      const lead = part.match(/^(\d+)(.*)$/);
+      if (lead) { mult = +lead[1]; part = lead[2]; }
+      const m = parseGroup(part);
+      if (m == null) return null;
+      total += mult * m;
+    }
+    return total;
+  }
+  function parseGroup(s) {
+    let i = 0;
+    function group() {
+      let sum = 0;
+      while (i < s.length && s[i] !== ")" && s[i] !== "]") {
+        let val;
+        if (s[i] === "(" || s[i] === "[") {
+          i++; val = group();
+          if (val == null || (s[i] !== ")" && s[i] !== "]")) return null;
+          i++;
+        } else {
+          const m = s.slice(i).match(/^([A-Z][a-z]?)/);
+          if (!m || AW[m[1]] == null) return null;
+          val = AW[m[1]]; i += m[1].length;
+        }
+        const n = s.slice(i).match(/^(\d+)/);
+        let k = 1;
+        if (n) { k = +n[1]; i += n[1].length; }
+        sum += val * k;
+      }
+      return sum;
+    }
+    if (!s) return null;
+    const v = group();
+    return (v != null && i === s.length) ? v : null;
+  }
+  const isFormula = (t) => /^[A-Z(\[]/.test(t) && molarMass(t) != null;
+
+  function parseEquation(eq) {
+    if (!eq || !eq.trim()) return null;
+    const sides = eq.split(/->|→|=>|=/);
+    if (sides.length !== 2) return null;
+    const coef = {};
+    for (const side of sides) {
+      for (let term of side.split(/\s\+\s|\s+\+\s*|\s*\+\s+/)) {
+        term = term.trim().replace(/\((s|l|g|aq)\)$/, "").trim();
+        if (!term) continue;
+        const m = term.match(/^(\d+(?:\.\d+)?)?\s*(.+)$/);
+        coef[m[2].trim()] = m[1] ? +m[1] : 1;
+      }
+    }
+    return coef;
+  }
+
+  // ---- numbers ----
+  function parseNum(str) {
+    if (str == null) return NaN;
+    let s = String(str).trim().replace(/,/g, "").replace(/−/g, "-");
+    if (!s) return NaN;
+    s = s.replace(/\s*[x×*·]\s*10\s*\^\s*\(?\s*([+-]?\d+)\s*\)?/i, "e$1")
+         .replace(/\s*[x×*·]\s*10([⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)/, (m, sup) => "e" + fromSup(sup));
+    if (!/^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.test(s)) return NaN;
+    return parseFloat(s);
+  }
+  const SUP = { "⁻": "-", "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9" };
+  const fromSup = (s) => [...s].map(c => SUP[c] ?? c).join("");
+  const toSup = (n) => String(n).split("").map(c => ({ "-": "⁻", 0: "⁰", 1: "¹", 2: "²", 3: "³", 4: "⁴", 5: "⁵", 6: "⁶", 7: "⁷", 8: "⁸", 9: "⁹" })[c]).join("");
+
+  function fmt(x, sig = 4) {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e-3 && a < 1e6) {
+      let s = Number(x.toPrecision(sig)).toString();
+      return s;
+    }
+    const [mant, ex] = x.toExponential(sig - 1).split("e");
+    return `${Number(mant)} × 10${toSup(+ex)}`;
+  }
+
+  // ---- unit expressions ----
+  // A side is a list of terms {sym, label, exp, f, d}; an expression map is key -> {sym,label,exp,f,d}
+  function tokenize(str) {
+    let s = String(str || "")
+      .replace(/formula\s+units?/gi, "fu")
+      .replace(/fl\.?\s+oz/gi, "floz")
+      .replace(/[²³¹⁰⁴⁵⁶⁷⁸⁹⁻]+/g, m => "^" + fromSup(m))
+      .replace(/([A-Za-z0-9)\]])[·•*.](\d*[A-Z])/g, "$1\u0001$2")
+      .replace(/[·•*×]/g, " ")
+      .replace(/\u0001/g, "·")
+      .replace(/\s*\^\s*/g, "^")
+      .replace(/\(|\)/g, " ");
+    return s.split(/\s+/).filter(Boolean);
+  }
+  function parseSide(str) {
+    const toks = tokenize(str);
+    const terms = [];
+    for (const raw of toks) {
+      if (raw === "1") continue;
+      if (/^of$/i.test(raw) && terms.length) continue;
+      const prev = terms[terms.length - 1];
+      // chemical label after a mass/amount/count/volume unit
+      if (prev && isFormula(raw) && labelable(prev)) { prev.label = prev.label ? prev.label + " " + raw : raw; continue; }
+      let m = raw.match(/^(.+?)\^(-?\d+)$/);
+      let base = raw, e = 1;
+      if (m) { base = m[1]; e = +m[2]; }
+      else {
+        const m2 = raw.match(/^([A-Za-zμµÅ]+?)(\d)$/);
+        if (m2 && lookup(m2[1]) && !isFormula(raw)) { base = m2[1]; e = +m2[2]; }
+      }
+      const u = lookup(base);
+      if (u && !(prev && prev.label && !m)) {
+        terms.push({ sym: u.sym, label: "", exp: e, f: u.f, d: u.d });
+      } else if (prev) {
+        prev.label = prev.label ? prev.label + " " + raw : raw;
+      } else {
+        return { error: `“${raw}” isn't a unit I recognize.` };
+      }
+    }
+    return { terms };
+  }
+  function labelable(t) {
+    const d = t.d;
+    const only = (i) => d.every((v, j) => (j === i ? v !== 0 : v === 0));
+    return only(1) || only(3) || only(4) || only(0) && d[0] === 3;
+  }
+  const keyOf = (t) => t.sym + (t.label ? "|" + t.label : "");
+
+  // parse "g/mL", "kg m^2/s^2", "mol NaCl/L solution"
+  function parseExpr(str) {
+    const parts = String(str || "").split("/");
+    const map = {};
+    const sides = [];
+    for (let i = 0; i < parts.length; i++) {
+      const r = parseSide(parts[i]);
+      if (r.error) return { error: r.error };
+      const sign = i === 0 ? 1 : -1;
+      for (const t of r.terms) addTerm(map, t, sign);
+      sides.push(r.terms);
+    }
+    return { map: clean(map), sides };
+  }
+  function addTerm(map, t, k) {
+    const key = keyOf(t);
+    if (!map[key]) map[key] = { sym: t.sym, label: t.label, f: t.f, d: t.d, exp: 0 };
+    map[key].exp += t.exp * k;
+  }
+  function clean(map) { for (const k in map) if (map[k].exp === 0) delete map[k]; return map; }
+  function mulMap(a, b, k = 1) {
+    const out = {};
+    for (const key in a) out[key] = { ...a[key] };
+    for (const key in b) {
+      if (!out[key]) out[key] = { ...b[key], exp: 0 };
+      out[key].exp += b[key].exp * k;
+    }
+    return clean(out);
+  }
+  function eqMap(a, b) {
+    const ka = Object.keys(a), kb = Object.keys(b);
+    if (ka.length !== kb.length) return false;
+    return ka.every(k => b[k] && b[k].exp === a[k].exp);
+  }
+  function siOf(map) {
+    let f = 1; const d = [0, 0, 0, 0, 0];
+    for (const k in map) { const t = map[k]; f *= Math.pow(t.f, t.exp); t.d.forEach((v, i) => d[i] += v * t.exp); }
+    return { f, d };
+  }
+  function labelsOf(map) { return [...new Set(Object.values(map).map(t => t.label).filter(Boolean))].sort().join(","); }
+  const dimEq = (a, b) => a.every((v, i) => Math.abs(v - b[i]) < 1e-9);
+
+  function unitText(t, exp) {
+    const e = exp ?? t.exp;
+    return (t.sym === "floz" ? "fl oz" : t.sym) + (Math.abs(e) !== 1 ? toSup(Math.abs(e)) : "") + (t.label ? " " + t.label : "");
+  }
+  function mapText(map) {
+    const num = [], den = [];
+    for (const k in map) { const t = map[k]; (t.exp > 0 ? num : den).push(unitText(t)); }
+    if (!num.length && !den.length) return "(no units)";
+    const n = num.length ? num.join("·") : "1";
+    return den.length ? `${n}/${den.length > 1 ? "(" + den.join("·") + ")" : den[0]}` : n;
+  }
+
+  // ---- equivalences: returns r such that 1 [N] = r [D]  (null if unknown) ----
+  function single(map) {
+    const ks = Object.keys(map);
+    return ks.length === 1 && map[ks[0]].exp === 1 ? map[ks[0]] : null;
+  }
+  function toMol(t) {
+    const d = t.d;
+    if (dimEq(d, [0, 1, 0, 0, 0])) { const M = molarMass(t.label); return M ? t.f / M : null; }
+    if (dimEq(d, [0, 0, 0, 1, 0])) return t.f;
+    if (dimEq(d, [0, 0, 0, 0, 1])) return t.f / NA;
+    return null;
+  }
+  function parseRelation(line) {
+    const m = String(line).split("=");
+    if (m.length !== 2) return null;
+    const a = parseQty(m[0]), b = parseQty(m[1]);
+    if (!a || !b || a.error || b.error) return null;
+    return { a, b, text: line.trim() };
+  }
+  function parseQty(str) {
+    const s = String(str || "").trim();
+    const m = s.match(/^([+-]?[\d.,]+(?:\s*(?:e|[x×*·]\s*10\s*\^?)\s*[+-]?\d+|\s*[x×*·]\s*10[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)?)\s*(.*)$/i);
+    if (!m) return { error: "Start with a number, like 3.75 lb." };
+    const v = parseNum(m[1]);
+    if (!isFinite(v)) return { error: "That number isn't readable." };
+    const u = parseExpr(m[2]);
+    if (u.error) return { error: u.error };
+    return { value: v, map: u.map, unitStr: m[2].trim() };
+  }
+  function compat(a, b) {
+    const sa = siOf(a), sb = siOf(b);
+    if (!dimEq(sa.d, sb.d)) return false;
+    const la = labelsOf(a), lb = labelsOf(b);
+    return la === lb || !la || !lb;
+  }
+  function equivalence(N, D, ctx = {}) {
+    const sN = siOf(N), sD = siOf(D);
+    if (compat(N, D)) return { r: sN.f / sD.f, kind: "unit" };
+    const n1 = single(N), d1 = single(D);
+    if (n1 && d1 && n1.label && d1.label) {
+      const mn = toMol(n1), md = toMol(d1);
+      if (mn != null && md != null) {
+        if (n1.label === d1.label) {
+          const kind = dimEq(n1.d, [0, 0, 0, 0, 1]) || dimEq(d1.d, [0, 0, 0, 0, 1]) ? "avogadro" : "molar mass";
+          return { r: mn / md, kind };
+        }
+        const co = ctx.coef;
+        if (co && co[n1.label] && co[d1.label] && dimEq(n1.d, [0, 0, 0, 1, 0]) && dimEq(d1.d, [0, 0, 0, 1, 0])) {
+          return { r: (mn * co[d1.label] / co[n1.label]) / md, kind: "mole ratio" };
+        }
+      }
+    }
+    for (const rel of ctx.relations || []) {
+      const A = rel.a.map, B = rel.b.map;
+      const sA = siOf(A), sB = siOf(B);
+      if (compat(N, A) && compat(D, B)) return { r: (sN.f / sA.f) * (rel.b.value / rel.a.value) * (sB.f / sD.f), kind: "given" };
+      if (compat(N, B) && compat(D, A)) return { r: (sN.f / sB.f) * (rel.a.value / rel.b.value) * (sA.f / sD.f), kind: "given" };
+    }
+    return null;
+  }
+  const TOL = 0.0025;
+  function checkFactor(numMap, nv, denMap, dv, ctx) {
+    const eq = equivalence(numMap, denMap, ctx);
+    if (!isFinite(nv) || !isFinite(dv) || nv === 0 || dv === 0) return { status: "empty" };
+    if (!eq) return { status: "unknown" };
+    const actual = dv / nv;
+    const ok = Math.abs(actual / eq.r - 1) < TOL;
+    return { status: ok ? "ok" : "bad", expected: nv * eq.r, kind: eq.kind };
+  }
+  function makeCtx(problem) {
+    const ctx = { relations: [], coef: null };
+    if (!problem) return ctx;
+    for (const line of problem.given || []) { const r = parseRelation(line); if (r) ctx.relations.push(r); }
+    ctx.coef = parseEquation(problem.equation);
+    return ctx;
+  }
+
+  return { parseExpr, parseQty, parseNum, parseRelation, parseEquation, molarMass, mulMap, eqMap, mapText, unitText,
+    keyOf, checkFactor, equivalence, makeCtx, fmt, toSup, siOf, lookup };
+})();
+if (typeof module !== "undefined") module.exports = UE;
+/* ===== App ===== */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const blank = () => ({ num: "", den: "", exp: 1, nv: "", dv: "", stage: "units", check: null, reveal: false, tries: 0 });
+const scaleMap = (m, k) => UE.mulMap({}, m, k);
+const ORD = ["", "", "2nd", "3rd", "4th"];
+
+const BUILTIN = [
+  { id: "b01", topic: "Metric prefixes", prompt: "Convert 0.0457 km to centimeters.", start: "0.0457 km", target: "cm",
+    solution: [{ num: "m", den: "km", exp: 1, nv: "1000", dv: "1" }, { num: "cm", den: "m", exp: 1, nv: "100", dv: "1" }] },
+  { id: "b02", topic: "English ↔ metric", prompt: "A bag of flour weighs 3.75 lb. What is its mass in grams?", start: "3.75 lb", target: "g",
+    solution: [{ num: "g", den: "lb", exp: 1, nv: "453.6", dv: "1" }] },
+  { id: "b03", topic: "Rates", prompt: "A car travels at 65 mi/h. What is its speed in m/s?", start: "65 mi/h", target: "m/s",
+    solution: [{ num: "m", den: "mi", exp: 1, nv: "1609", dv: "1" }, { num: "h", den: "min", exp: 1, nv: "1", dv: "60" }, { num: "min", den: "s", exp: 1, nv: "1", dv: "60" }] },
+  { id: "b04", topic: "Area & volume", prompt: "A lab bench top has an area of 1.20 m². What is the area in cm²?", start: "1.20 m^2", target: "cm^2",
+    solution: [{ num: "cm", den: "m", exp: 2, nv: "100", dv: "1" }] },
+  { id: "b05", topic: "Area & volume", prompt: "An engine has a displacement of 350 in³. What is that volume in liters?", start: "350 in^3", target: "L",
+    hint: "Get to cm³ first (cube the inch-to-centimeter factor), then use 1 mL = 1 cm³.",
+    solution: [{ num: "cm", den: "in", exp: 3, nv: "2.54", dv: "1" }, { num: "mL", den: "cm^3", exp: 1, nv: "1", dv: "1" }, { num: "L", den: "mL", exp: 1, nv: "1", dv: "1000" }] },
+  { id: "b06", topic: "Pressure & energy", prompt: "The barometer reads 745 mmHg. What is the pressure in atmospheres?", start: "745 mmHg", target: "atm",
+    solution: [{ num: "atm", den: "mmHg", exp: 1, nv: "1", dv: "760" }] },
+  { id: "b07", topic: "Pressure & energy", prompt: "A granola bar contains 210 Cal (food Calories). How many kilojoules is that?", start: "210 Cal", target: "kJ",
+    hint: "1 Cal = 1 kcal = 4.184 kJ.",
+    solution: [{ num: "kJ", den: "Cal", exp: 1, nv: "4.184", dv: "1" }] },
+  { id: "b08", topic: "Density", prompt: "Concentrated sulfuric acid has a density of 1.84 g/mL. What is the mass, in kilograms, of 2.50 L of the acid?", start: "2.50 L H2SO4", target: "kg H2SO4",
+    given: ["1.84 g H2SO4 = 1 mL H2SO4"], hint: "Density connects mL to g. Get the volume into mL first.",
+    solution: [{ num: "mL H2SO4", den: "L H2SO4", exp: 1, nv: "1000", dv: "1" }, { num: "g H2SO4", den: "mL H2SO4", exp: 1, nv: "1.84", dv: "1" }, { num: "kg H2SO4", den: "g H2SO4", exp: 1, nv: "1", dv: "1000" }] },
+  { id: "b09", topic: "Moles & molar mass", prompt: "How many moles of sodium chloride are in 25.0 g of NaCl?", start: "25.0 g NaCl", target: "mol NaCl",
+    solution: [{ num: "mol NaCl", den: "g NaCl", exp: 1, nv: "1", dv: "58.44" }] },
+  { id: "b10", topic: "Moles & molar mass", prompt: "How many water molecules are in 10.0 g of H₂O?", start: "10.0 g H2O", target: "molecules H2O",
+    hint: "Grams → moles uses molar mass. Moles → molecules uses Avogadro's number.",
+    solution: [{ num: "mol H2O", den: "g H2O", exp: 1, nv: "1", dv: "18.02" }, { num: "molecules H2O", den: "mol H2O", exp: 1, nv: "6.022e23", dv: "1" }] },
+  { id: "b11", topic: "Solutions", prompt: "How many grams of NaOH are needed to make 250. mL of 0.100 M NaOH solution?", start: "250. mL solution", target: "g NaOH",
+    given: ["0.100 mol NaOH = 1 L solution"], hint: "0.100 M means 0.100 mol NaOH per 1 L of solution.",
+    solution: [{ num: "L solution", den: "mL solution", exp: 1, nv: "1", dv: "1000" }, { num: "mol NaOH", den: "L solution", exp: 1, nv: "0.100", dv: "1" }, { num: "g NaOH", den: "mol NaOH", exp: 1, nv: "40.00", dv: "1" }] },
+  { id: "b12", topic: "Stoichiometry", prompt: "Hydrogen burns in oxygen: 2 H₂ + O₂ → 2 H₂O. How many grams of water form from 4.00 g of H₂?", start: "4.00 g H2", target: "g H2O",
+    equation: "2 H2 + O2 -> 2 H2O", hint: "Grams of H₂ → moles of H₂ → moles of H₂O (mole ratio from the equation) → grams of H₂O.",
+    solution: [{ num: "mol H2", den: "g H2", exp: 1, nv: "1", dv: "2.016" }, { num: "mol H2O", den: "mol H2", exp: 1, nv: "2", dv: "2" }, { num: "g H2O", den: "mol H2O", exp: 1, nv: "18.02", dv: "1" }] }
+];
+const TOPICS = ["Metric prefixes", "English ↔ metric", "Rates", "Area & volume", "Pressure & energy", "Density", "Moles & molar mass", "Solutions", "Stoichiometry"];
+
+function parseFactor(f) {
+  if (!f.num.trim() && !f.den.trim()) return { error: "This factor is empty.", empty: true };
+  if (!f.num.trim()) return { error: "Put a unit on top of this factor." };
+  if (!f.den.trim()) return { error: "Put a unit on the bottom of this factor." };
+  const n = UE.parseExpr(f.num), d = UE.parseExpr(f.den);
+  if (n.error) return { error: n.error };
+  if (d.error) return { error: d.error };
+  const base = UE.mulMap(n.map, d.map, -1);
+  return { numMap: n.map, denMap: d.map, numSides: n.sides, denSides: d.sides, map: scaleMap(base, f.exp) };
+}
+function computeAnswer(p) {
+  const s = UE.parseQty(p.start); if (s.error) return null;
+  let v = s.value;
+  for (const f of p.solution || []) v *= Math.pow(UE.parseNum(f.nv) / UE.parseNum(f.dv), f.exp || 1);
+  return v;
+}
+BUILTIN.forEach(p => { p.builtin = true; p.answer = computeAnswer(p); });
+
+/* ---------- store ---------- */
+const store = { saved: [], hidden: [], db: null, canAuthor: false, listeners: [] };
+function allProblems() {
+  return [...BUILTIN.filter(p => !store.hidden.includes(p.id)), ...store.saved];
+}
+function onProblemsChange() { store.listeners.forEach(fn => fn()); }
+
+/* ---------- Chain component ---------- */
+class Chain {
+  constructor(el, mode, opts = {}) {
+    this.el = el; this.mode = mode; this.opts = { stat() {}, ...opts };
+    this.stepwise = mode === "tutor" || mode === "calc";
+    el.addEventListener("input", (e) => this.onInput(e));
+    el.addEventListener("change", (e) => this.onChange(e));
+    el.addEventListener("click", (e) => this.onClick(e));
+    el.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" || e.target.tagName !== "INPUT") return;
+      const b = el.querySelector(".btn.primary"); if (b) { e.preventDefault(); b.click(); }
+    });
+    this.reset(null);
+  }
+  reset(problem) {
+    this.problem = problem;
+    const ex = { solver: ["65 mi/h", "m/s"], calc: ["3.75 lb", "kg"] }[this.mode] || ["", ""];
+    this.start = problem ? problem.start : ex[0];
+    this.target = problem ? problem.target : ex[1];
+    this.calcStarted = false;
+    this.factors = [blank()];
+    this.phase = "units"; this.msgs = []; this.result = null; this.complete = false; this.hintLevel = 0;
+    this.render();
+  }
+  get ctx() { return this.mode === "author" ? UE.makeCtx(this.opts.draft()) : this.mode === "calc" ? UE.makeCtx({ given: this.opts.given() }) : UE.makeCtx(this.problem); }
+  get fixedEnds() { return this.mode === "tutor" || (this.mode === "calc" && this.calcStarted) || (this.mode === "solver" && !!this.problem); }
+  unitsEditable(f, i) {
+    if (this.mode === "author") return true;
+    if (this.mode === "solver") return this.phase === "units";
+    return f.stage === "units" && !this.complete;
+  }
+  numbersVisible(f) {
+    if (this.mode === "author") return true;
+    if (this.mode === "solver") return this.phase === "numbers";
+    return f.stage !== "units";
+  }
+
+  /* ----- events ----- */
+  onInput(e) {
+    const t = e.target, k = t.dataset.k;
+    if (!k) return;
+    if (k === "start") { this.start = t.value; this.dirty(); return; }
+    if (k === "target") { this.target = t.value; this.dirty(); return; }
+    const f = this.factors[+t.dataset.i];
+    f[k] = t.value;
+    if (k === "nv" || k === "dv") { f.check = null; f.reveal = false; const box = t.closest(".factor"); box && box.classList.remove("ok", "bad", "unknown"); }
+    this.dirty();
+  }
+  onChange(e) {
+    const t = e.target;
+    if (t.dataset.k === "exp") { this.factors[+t.dataset.i].exp = +t.value; this.dirty(); this.render(); }
+  }
+  dirty() { if (this.mode === "author") { this.verified = null; this.opts.onDirty && this.opts.onDirty(); } }
+  onClick(e) {
+    const b = e.target.closest("[data-act]");
+    if (!b) return;
+    const act = b.dataset.act, i = +b.dataset.i;
+    if (act === "add") { this.factors.push(blank()); this.msgs = []; this.render(); this.focusLast(); }
+    else if (act === "rm") { this.factors.splice(i, 1); if (!this.factors.length) this.factors.push(blank()); this.msgs = []; this.dirty(); this.render(); }
+    else if (act === "checkUnits") this.checkUnits();
+    else if (act === "editUnits") { this.phase = "units"; this.result = null; this.factors.forEach(f => { f.check = null; f.reveal = false; }); this.msgs = []; this.render(); }
+    else if (act === "checkNumbers") this.checkNumbers();
+    else if (act === "reveal") { this.factors[i].reveal = true; this.opts.stat("hints"); this.render(); }
+    else if (act === "step") this.tutorStep();
+    else if (act === "values") this.tutorValues();
+    else if (act === "hint") this.tutorHint(false);
+    else if (act === "show") this.tutorHint(true);
+    else if (act === "restart") { this.reset(this.problem); }
+    else if (act === "nextProblem") this.opts.next && this.opts.next();
+    else if (act === "verify") this.verify();
+    else if (act === "calcStart") this.calcStart();
+    else if (act === "newCalc") { const st = this.start, tg = this.target; this.reset(null); this.start = st; this.target = tg; this.render(); }
+  }
+  focusLast() { const ins = this.el.querySelectorAll(".factor input.u"); const x = ins[ins.length - 2]; x && x.focus(); }
+
+  /* ----- unit math ----- */
+  running(upTo) { // product of start and factors [0, upTo)
+    const s = UE.parseQty(this.start);
+    if (s.error) return { error: "Starting quantity: " + s.error };
+    let m = s.map;
+    for (let i = 0; i < upTo; i++) {
+      const p = parseFactor(this.factors[i]);
+      if (p.error) return { error: `Factor ${i + 1}: ${p.error}`, i };
+      m = UE.mulMap(m, p.map);
+    }
+    return { map: m, value: s.value };
+  }
+  targetMap() {
+    if (!this.target.trim()) return { error: "Enter the target units on the right." };
+    const t = UE.parseExpr(this.target);
+    return t.error ? { error: "Target units: " + t.error } : { map: t.map };
+  }
+  diagnose(startMap, targetMap, finalMap) {
+    const out = [];
+    const extra = UE.mulMap(finalMap, targetMap, -1);
+    const top = [], bottom = [];
+    for (const k in extra) (extra[k].exp > 0 ? top : bottom).push(extra[k]);
+    let line = `Your units come out as <code>${esc(UE.mapText(finalMap))}</code>, but the target is <code>${esc(UE.mapText(targetMap))}</code>.`;
+    const parts = [];
+    if (top.length) parts.push(`extra on top: ${top.map(t => `<code>${esc(UE.unitText(t))}</code>`).join(", ")}`);
+    if (bottom.length) parts.push(`extra on the bottom: ${bottom.map(t => `<code>${esc(UE.unitText(t))}</code>`).join(", ")}`);
+    if (parts.length) line += " Compared with the target there is " + parts.join("; ") + ".";
+    out.push({ type: "bad", html: line });
+    // flip & power hints
+    let R = startMap;
+    this.factors.forEach((f, i) => {
+      const p = parseFactor(f);
+      if (p.error) return;
+      let cancels = false, piles = false;
+      for (const k in p.map) {
+        if (!R[k]) continue;
+        if (Math.sign(R[k].exp) !== Math.sign(p.map[k].exp)) cancels = true; else piles = true;
+      }
+      if (!cancels && piles) out.push({ type: "warn", html: `Factor ${i + 1} looks upside down. Its units pile up on the units you already have instead of canceling them. Try flipping it.` });
+      for (const k in p.map) {
+        if (!R[k] || Math.sign(R[k].exp) === Math.sign(p.map[k].exp)) continue;
+        const after = R[k].exp + p.map[k].exp;
+        if (after !== 0 && Math.sign(after) === Math.sign(R[k].exp)) {
+          const need = Math.abs(R[k].exp / (p.map[k].exp / f.exp));
+          if (Number.isInteger(need) && need > 1) out.push({ type: "warn", html: `<code>${esc(UE.unitText(R[k]))}</code> only partly cancels in factor ${i + 1}. Raise that factor to the ${ORD[need] || need + "th"} power with the small box in its corner.` });
+        } else if (after !== 0) {
+          out.push({ type: "warn", html: `Factor ${i + 1} cancels more <code>${esc(R[k].sym)}</code> than you have. Check its power.` });
+        }
+      }
+      R = UE.mulMap(R, p.map);
+    });
+    return out;
+  }
+
+  /* ----- solver ----- */
+  checkUnits() {
+    this.msgs = [];
+    const tm = this.targetMap();
+    if (tm.error) { this.msgs.push({ type: "bad", html: esc(tm.error) }); return this.render(); }
+    const filled = this.factors.filter(f => f.num.trim() || f.den.trim());
+    if (!filled.length) {
+      const s = UE.parseQty(this.start);
+      if (!s.error && UE.eqMap(s.map, tm.map)) { this.msgs.push({ type: "info", html: "The starting units already match the target. No conversion needed." }); return this.render(); }
+      this.msgs.push({ type: "bad", html: "Add at least one conversion factor." }); return this.render();
+    }
+    this.factors = filled.length ? this.factors.filter(f => f.num.trim() || f.den.trim()) : this.factors;
+    const r = this.running(this.factors.length);
+    if (r.error) { this.msgs.push({ type: "bad", html: esc(r.error) }); return this.render(); }
+    if (UE.eqMap(r.map, tm.map)) {
+      this.phase = "numbers";
+      this.msgs.push({ type: "ok", html: `The units cancel to <code>${esc(UE.mapText(tm.map))}</code>. Now enter the numbers that make each factor a true equality.` });
+    } else {
+      this.msgs.push(...this.diagnose(UE.parseQty(this.start).map, tm.map, r.map));
+    }
+    this.render();
+  }
+  checkNumbers() {
+    this.msgs = []; this.result = null;
+    const ctx = this.ctx;
+    const s = UE.parseQty(this.start);
+    let v = s.value, missing = [], bad = [], unknown = [];
+    this.factors.forEach((f, i) => {
+      const p = parseFactor(f);
+      const nv = UE.parseNum(f.nv), dv = UE.parseNum(f.dv);
+      f.check = UE.checkFactor(p.numMap, nv, p.denMap, dv, ctx);
+      f.parsed = p;
+      if (f.check.status === "empty") missing.push(i + 1);
+      else if (f.check.status === "bad") bad.push(i + 1);
+      else { if (f.check.status === "unknown") unknown.push(i + 1); v *= Math.pow(nv / dv, f.exp); }
+    });
+    if (missing.length) this.msgs.push({ type: "bad", html: `Enter both numbers in factor${missing.length > 1 ? "s" : ""} ${missing.join(", ")}. Neither can be zero.` });
+    if (bad.length) this.msgs.push({ type: "bad", html: `Factor${bad.length > 1 ? "s" : ""} ${bad.join(", ")} ${bad.length > 1 ? "aren't true equalities" : "isn't a true equality"}: the top and bottom amounts are not equal. Check the value, or use <b>Show value</b> on the factor.` });
+    if (!missing.length && !bad.length) {
+      this.result = v;
+      if (unknown.length) this.msgs.push({ type: "warn", html: `I couldn't verify factor${unknown.length > 1 ? "s" : ""} ${unknown.join(", ")}: it's not a standard conversion and the problem doesn't state it. The answer assumes it's right.` });
+      const tm = this.targetMap().map;
+      let line = `Every factor checks out. Answer: <b>${esc(UE.fmt(v))} ${esc(UE.mapText(tm))}</b>.`;
+      if (this.problem && this.problem.answer && Math.abs(v / this.problem.answer - 1) > 0.01) line += " (This differs from the worked solution by more than 1%. Check the starting value.)";
+      this.msgs.push({ type: "ok", html: line });
+    }
+    this.render();
+  }
+
+  /* ----- tutor ----- */
+  cur() { return this.factors[this.factors.length - 1]; }
+  tutorStep() {
+    const i = this.factors.length - 1, f = this.cur();
+    this.msgs = [];
+    const R = this.running(i).map;
+    const p = parseFactor(f);
+    f.tries++;
+    if (p.error) { this.msgs.push({ type: "bad", html: esc(p.error) }); return this.render(); }
+    const cancel = [], pile = [];
+    for (const k in p.map) {
+      if (!R[k]) continue;
+      (Math.sign(R[k].exp) !== Math.sign(p.map[k].exp) ? cancel : pile).push(k);
+    }
+    if (!cancel.length) {
+      const fl = pile.length ? " It looks upside down. Flip it so the unit you want to get rid of is on the opposite side." : "";
+      this.msgs.push({ type: "bad", html: `This factor doesn't cancel anything you have right now. Your units are <code>${esc(UE.mapText(R))}</code>.${fl}` });
+      return this.render();
+    }
+    for (const k of cancel) {
+      const after = R[k].exp + p.map[k].exp;
+      if (after === 0) continue;
+      if (Math.sign(after) === Math.sign(R[k].exp)) {
+        const need = Math.abs(R[k].exp / (p.map[k].exp / f.exp));
+        this.msgs.push({ type: "bad", html: `<code>${esc(UE.unitText(R[k]))}</code> only partly cancels.` + (Number.isInteger(need) ? ` Raise this factor to the ${ORD[need] || need + "th"} power with the small box in its corner.` : "") });
+      } else this.msgs.push({ type: "bad", html: `This cancels more <code>${esc(R[k].sym)}</code> than you have. Lower the factor's power.` });
+      return this.render();
+    }
+    if (f.tries === 1) this.opts.stat("clean");
+    this.opts.stat("steps");
+    f.stage = "numbers"; f.tries = 0;
+    const gone = cancel.map(k => `<code>${esc(UE.unitText(R[k]))}</code>`).join(" and ");
+    this.msgs.push({ type: "ok", html: `Good. This cancels ${gone}. Now enter the numbers: what amount on top equals the amount on the bottom?` });
+    this.render();
+    const n = this.el.querySelector(".factor.current input.n"); n && n.focus();
+  }
+  tutorValues() {
+    const i = this.factors.length - 1, f = this.cur();
+    this.msgs = [];
+    const p = parseFactor(f);
+    const nv = UE.parseNum(f.nv), dv = UE.parseNum(f.dv);
+    f.check = UE.checkFactor(p.numMap, nv, p.denMap, dv, this.ctx);
+    f.tries++;
+    if (f.check.status === "empty") { this.msgs.push({ type: "bad", html: "Enter a number on top and on the bottom. Neither can be zero." }); return this.render(); }
+    if (f.check.status === "bad") {
+      this.msgs.push({ type: "bad", html: `${esc(f.nv)} ${esc(UE.mapText(p.numMap))} doesn't equal ${esc(f.dv)} ${esc(UE.mapText(p.denMap))}. ` + (f.tries >= 2 ? "Use <b>Show value</b> if you're stuck." : "Check the relationship and try again.") });
+      return this.render();
+    }
+    if (f.tries === 1) this.opts.stat("clean");
+    this.opts.stat("steps");
+    if (f.check.status === "unknown") this.msgs.push({ type: "warn", html: "I can't verify this relationship from the problem's data, so I'm accepting it. Double-check it against the problem." });
+    f.stage = "done";
+    const R = this.running(i + 1).map, tm = this.targetMap().map;
+    if (UE.eqMap(R, tm)) {
+      const s = UE.parseQty(this.start);
+      let v = s.value;
+      this.factors.forEach(x => v *= Math.pow(UE.parseNum(x.nv) / UE.parseNum(x.dv), x.exp));
+      this.result = v; this.complete = true;
+      this.opts.stat("solved");
+      this.msgs.push({ type: "ok", html: `Solved. All the units cancel to <code>${esc(UE.mapText(tm))}</code>, and the answer is <b>${esc(UE.fmt(v))} ${esc(UE.mapText(tm))}</b>.` });
+    } else {
+      this.factors.push(blank());
+      this.msgs.push({ type: "info", html: `Correct. Your units are now <code>${esc(UE.mapText(R))}</code>. The target is <code>${esc(UE.mapText(tm))}</code>. Build the next factor.` });
+    }
+    this.hintLevel = 0;
+    this.render();
+    if (!this.complete) this.focusLast();
+  }
+  tutorHint(show) {
+    const f = this.cur(), i = this.factors.length - 1;
+    this.msgs = [];
+    this.opts.stat("hints");
+    if (f.stage === "numbers") {
+      const p = parseFactor(f);
+      if (!UE.parseNum(f.nv)) f.nv = "1";
+      const c = UE.checkFactor(p.numMap, UE.parseNum(f.nv), p.denMap, 1, this.ctx);
+      if (c.expected == null) { this.msgs.push({ type: "info", html: esc((this.problem && this.problem.hint) || (this.mode === "calc" ? "This isn't a standard conversion. Use the relationship stated in your problem, and add it under Given data so it can be checked." : "Look for this relationship in the problem statement.")) }); return this.render(); }
+      f.check = { status: "hint", expected: c.expected }; f.reveal = true;
+      this.msgs.push({ type: "info", html: "The relationship is shown under the factor. Enter the numbers, then check." });
+      return this.render();
+    }
+    const R = this.running(i).map;
+    if (this.mode === "calc") return this.calcHint(R);
+    const sol = (this.problem.solution || []).map(s => ({ s, p: parseFactor({ ...blank(), ...s }) }));
+    const next = sol.find(({ p }) => !p.error && Object.keys(p.map).some(k => R[k] && Math.sign(R[k].exp) !== Math.sign(p.map[k].exp)));
+    if (!next) { this.msgs.push({ type: "info", html: esc(this.problem.hint || "Look at which units you still need to get rid of, and which you need to end up with.") }); return this.render(); }
+    if (show) {
+      Object.assign(f, { num: next.s.num, den: next.s.den, exp: next.s.exp || 1 });
+      this.msgs.push({ type: "info", html: "The units for the next step are filled in. Check the step, then enter the numbers." });
+    } else {
+      const k = Object.keys(next.p.map).find(k => R[k] && Math.sign(R[k].exp) !== Math.sign(next.p.map[k].exp));
+      const where = R[k].exp > 0 ? "bottom" : "top";
+      let html = `Get rid of <code>${esc(UE.unitText(R[k]))}</code>: put <code>${esc(UE.unitText({ ...R[k], exp: 1 }))}</code> on the ${where} of the next factor.`;
+      if (this.problem.hint) html += ` ${esc(this.problem.hint)}`;
+      this.msgs.push({ type: "info", html });
+    }
+    this.render();
+  }
+
+  /* ----- calculator ----- */
+  calcStart() {
+    this.msgs = [];
+    const s = UE.parseQty(this.start), tm = this.targetMap();
+    if (s.error) this.msgs.push({ type: "bad", html: "Starting quantity: " + esc(s.error) });
+    if (tm.error) this.msgs.push({ type: "bad", html: esc(tm.error) });
+    for (const g of this.opts.given()) if (!UE.parseRelation(g)) this.msgs.push({ type: "bad", html: `Can't read the given data “${esc(g)}”. Write it like <code>1.84 g = 1 mL</code>.` });
+    if (this.msgs.length) return this.render();
+    if (UE.eqMap(s.map, tm.map)) { this.msgs.push({ type: "info", html: "The starting units already match the target. No conversion needed." }); return this.render(); }
+    this.calcStarted = true; this.factors = [blank()];
+    this.msgs.push({ type: "info", html: `Start from <code>${esc(this.start.trim())}</code> and build one factor at a time until you reach <code>${esc(UE.mapText(tm.map))}</code>. Type the units first.` });
+    const a = UE.siOf(s.map).d, b = UE.siOf(tm.map).d;
+    if (a.some((v, j) => v !== b[j]) && !Object.values(s.map).some(t => t.label) && !this.opts.given().length)
+      this.msgs.push({ type: "warn", html: "Your start and target measure different kinds of quantity, so you'll need a relationship from the problem (a density or concentration, for example). Add it under Given data so it can be checked." });
+    this.render();
+    this.focusLast();
+  }
+  calcHint(R) {
+    const tm = this.targetMap().map;
+    const extra = UE.mulMap(R, tm, -1);
+    const ks = Object.keys(extra);
+    if (!ks.length) { this.msgs.push({ type: "info", html: "Your units already match the target." }); return this.render(); }
+    const k = ks.find(k => R[k]) || ks[0], t = extra[k];
+    const where = t.exp > 0 ? "bottom" : "top", other = t.exp > 0 ? "top" : "bottom";
+    let html = `Get rid of <code>${esc(UE.unitText(t))}</code>: put <code>${esc(UE.unitText({ ...t, exp: 1 }))}</code> on the ${where} of the next factor.`;
+    const same = Object.values(tm).find(u => u.d.every((v, j) => v === t.d[j]) && Math.sign(u.exp) === Math.sign(t.exp) && !R[UE.keyOf(u)]);
+    if (same) html += ` The target has <code>${esc(UE.unitText({ ...same, exp: 1 }))}</code>, which measures the same thing, so it could go on the ${other}.`;
+    if (Math.abs(t.exp) > 1) html += ` Because it's <code>${esc(UE.unitText(t))}</code>, you'll need to raise that factor to the ${ORD[Math.abs(t.exp)] || Math.abs(t.exp) + "th"} power.`;
+    this.msgs.push({ type: "info", html });
+    this.render();
+  }
+
+  /* ----- author ----- */
+  verify() {
+    this.msgs = []; this.verified = null; this.result = null;
+    const tm = this.targetMap();
+    const s = UE.parseQty(this.start);
+    if (s.error) { this.msgs.push({ type: "bad", html: "Starting quantity: " + esc(s.error) }); return this.render(); }
+    if (tm.error) { this.msgs.push({ type: "bad", html: esc(tm.error) }); return this.render(); }
+    this.factors = this.factors.filter(f => f.num.trim() || f.den.trim() || f.nv || f.dv);
+    if (!this.factors.length) { this.factors.push(blank()); this.msgs.push({ type: "bad", html: "Add the conversion factors for the solution." }); return this.render(); }
+    const r = this.running(this.factors.length);
+    if (r.error) { this.msgs.push({ type: "bad", html: esc(r.error) }); return this.render(); }
+    if (!UE.eqMap(r.map, tm.map)) { this.msgs.push(...this.diagnose(s.map, tm.map, r.map)); return this.render(); }
+    const ctx = this.ctx; let v = s.value, bad = [], unknown = [], empty = [];
+    this.factors.forEach((f, i) => {
+      const p = parseFactor(f), nv = UE.parseNum(f.nv), dv = UE.parseNum(f.dv);
+      f.check = UE.checkFactor(p.numMap, nv, p.denMap, dv, ctx);
+      if (f.check.status === "empty") empty.push(i + 1); else if (f.check.status === "bad") bad.push(i + 1);
+      else { if (f.check.status === "unknown") unknown.push(i + 1); v *= Math.pow(nv / dv, f.exp); }
+    });
+    if (empty.length) this.msgs.push({ type: "bad", html: `Fill in the numbers for factor ${empty.join(", ")}.` });
+    if (bad.length) this.msgs.push({ type: "bad", html: `Factor ${bad.join(", ")} isn't a true equality. Use <b>Show value</b> to see what I expect.` });
+    if (!empty.length && !bad.length) {
+      if (unknown.length) this.msgs.push({ type: "warn", html: `Factor ${unknown.join(", ")} can't be verified. If it comes from the problem's data, add it under <b>Given relationships</b> so students' answers can be checked.` });
+      this.result = v;
+      this.verified = { answer: v, solution: this.factors.map(f => ({ num: f.num.trim(), den: f.den.trim(), exp: f.exp, nv: f.nv.trim(), dv: f.dv.trim() })) };
+      this.msgs.push({ type: "ok", html: `Solution verified. Answer: <b>${esc(UE.fmt(v))} ${esc(UE.mapText(tm.map))}</b>. Ready to save.` });
+    }
+    this.opts.onVerified && this.opts.onVerified(this.verified);
+    this.render();
+  }
+
+  /* ----- render ----- */
+  tokensHTML(sides, struck, exp = 1) {
+    // sides[0] = numerator terms of this field; denominators (if a field contains "/") appended after a slash
+    return sides.map((terms, j) => (j ? '<span class="tok">/</span>' : "") + terms.map(t => {
+      const key = UE.keyOf(t);
+      const x = struck(key);
+      return `<span class="tok${x ? " x" : ""}">${esc(UE.unitText({ ...t, exp: t.exp }))}</span>`;
+    }).join(" ")).join("");
+  }
+  render() {
+    const editingEnds = !this.fixedEnds && (this.mode === "author" || this.phase === "units");
+    const sq = UE.parseQty(this.start);
+    let finalMap = null;
+    const lockedAny = this.factors.some((f, i) => !this.unitsEditable(f, i));
+    if (lockedAny || !editingEnds) {
+      let m = sq.error ? {} : sq.map;
+      this.factors.forEach((f, i) => { if (this.unitsEditable(f, i) && this.mode !== "solver") return; const p = parseFactor(f); if (!p.error) m = UE.mulMap(m, p.map); });
+      finalMap = m;
+    }
+    const struck = (key) => finalMap && !finalMap[key];
+    let h = "";
+    // start
+    h += `<div class="box start"><span class="cap">Start</span>`;
+    if (editingEnds) h += `<input type="text" id="${this.el.id}-start" data-k="start" value="${esc(this.start)}" placeholder="65 mi/h" aria-label="Starting quantity" autocomplete="off" spellcheck="false">`;
+    else if (!sq.error) {
+      const u = UE.parseExpr(sq.unitStr);
+      if (u.sides.length > 1) h += `<div class="frac"><div class="row"><span class="val">${esc(UE.fmt(sq.value))}</span> ${this.tokensHTML([u.sides[0]], struck)}</div><div class="rule"></div><div class="row">${u.sides.slice(1).map(s => this.tokensHTML([s], struck)).join(" ")}</div></div>`;
+      else h += `<div class="row"><span class="val">${esc(UE.fmt(sq.value))}</span> ${this.tokensHTML(u.sides, struck)}</div>`;
+    } else h += `<span class="tok">${esc(this.start)}</span>`;
+    h += `</div>`;
+    // factors
+    const showFactors = !(this.mode === "calc" && !this.calcStarted);
+    if (showFactors) this.factors.forEach((f, i) => {
+      const ue = this.unitsEditable(f, i), nvis = this.numbersVisible(f);
+      const cls = ["box", "factor"];
+      if (f.check && f.check.status !== "empty") cls.push(f.check.status);
+      if (this.stepwise && i === this.factors.length - 1 && !this.complete) cls.push("current");
+      h += `<span class="op">×</span><div class="${cls.join(" ")}"><span class="idx">${i + 1}</span>`;
+      const numIn = nvis && (!this.stepwise || f.stage === "numbers") ? `<input type="text" class="n" id="${this.el.id}-nv${i}" data-k="nv" data-i="${i}" value="${esc(f.nv)}" placeholder="#" aria-label="Factor ${i + 1} top number" inputmode="decimal" autocomplete="off">` : (nvis ? `<span class="val">${esc(f.nv)}</span>` : "");
+      const denIn = nvis && (!this.stepwise || f.stage === "numbers") ? `<input type="text" class="n" id="${this.el.id}-dv${i}" data-k="dv" data-i="${i}" value="${esc(f.dv)}" placeholder="#" aria-label="Factor ${i + 1} bottom number" inputmode="decimal" autocomplete="off">` : (nvis ? `<span class="val">${esc(f.dv)}</span>` : "");
+      let top, bot;
+      if (ue) {
+        top = `<input type="text" class="u" id="${this.el.id}-num${i}" data-k="num" data-i="${i}" value="${esc(f.num)}" placeholder="unit" aria-label="Factor ${i + 1} top unit" autocomplete="off" spellcheck="false">`;
+        bot = `<input type="text" class="u" id="${this.el.id}-den${i}" data-k="den" data-i="${i}" value="${esc(f.den)}" placeholder="unit" aria-label="Factor ${i + 1} bottom unit" autocomplete="off" spellcheck="false">`;
+      } else {
+        const p = parseFactor(f);
+        top = p.error ? esc(f.num) : this.tokensHTML(p.numSides, struck);
+        bot = p.error ? esc(f.den) : this.tokensHTML(p.denSides, struck);
+      }
+      let frac = `<div class="frac"><div class="row">${numIn}${top}</div><div class="rule"></div><div class="row">${denIn}${bot}</div></div>`;
+      if (!ue && f.exp > 1) frac = `<div class="paren"><span class="bk">(</span>${frac}<span class="bk">)</span><sup>${f.exp}</sup></div>`;
+      h += frac;
+      if (ue) h += `<select class="pow${f.exp > 1 ? " on" : ""}" id="${this.el.id}-exp${i}" data-k="exp" data-i="${i}" aria-label="Power for factor ${i + 1}" title="Raise this factor to a power (only if the units need it)">${[1, 2, 3].map(n => `<option value="${n}"${f.exp === n ? " selected" : ""}>^${n}</option>`).join("")}</select>`;
+      const canRm = ue && !this.stepwise && this.factors.length > 1;
+      if (canRm) h += `<button class="rm" data-act="rm" data-i="${i}" aria-label="Remove factor ${i + 1}" title="Remove factor">✕</button>`;
+      if (f.check && f.check.status === "bad") {
+        if (f.reveal) h += `<span class="reveal">${esc(f.nv)} ${esc(UE.mapText(parseFactor(f).numMap))} = ${esc(UE.fmt(f.check.expected))} ${esc(UE.mapText(parseFactor(f).denMap))}</span>`;
+        else h += `<button class="btn quiet" data-act="reveal" data-i="${i}">Show value</button>`;
+      } else if (f.reveal && f.check && f.check.expected != null && f.stage === "numbers") {
+        h += `<span class="reveal">${esc(f.nv)} ${esc(UE.mapText(parseFactor(f).numMap))} = ${esc(UE.fmt(f.check.expected))} ${esc(UE.mapText(parseFactor(f).denMap))}</span>`;
+      }
+      h += `</div>`;
+    });
+    if (this.mode === "author" || (this.mode === "solver" && this.phase === "units")) h += `<button class="addf" data-act="add">+ Factor</button>`;
+    // target
+    h += `<span class="op">=</span><div class="box target"><span class="cap">${this.result != null ? "Answer" : "Target units"}</span>`;
+    if (this.result != null) h += `<div class="answer">${esc(UE.fmt(this.result))}<small>rounded to 4 figures</small></div>`;
+    if (editingEnds) h += `<input type="text" id="${this.el.id}-target" data-k="target" value="${esc(this.target)}" placeholder="m/s" aria-label="Target units" autocomplete="off" spellcheck="false">`;
+    else { const t = UE.parseExpr(this.target); h += `<div class="row"><span class="tok">${esc(t.error ? this.target : UE.mapText(t.map))}</span></div>`; }
+    h += `</div>`;
+
+    // actions
+    let a = "";
+    if (this.mode === "solver") {
+      a = this.phase === "units"
+        ? `<button class="btn primary" data-act="checkUnits">Check units</button><span class="help">Numbers unlock when the units cancel to the target.</span>`
+        : `<button class="btn primary" data-act="checkNumbers">Check numbers</button><button class="btn" data-act="editUnits">Edit units</button>`;
+    } else if (this.mode === "tutor") {
+      if (!this.problem) a = "";
+      else if (this.complete) a = `<button class="btn primary" data-act="nextProblem">Next problem</button><button class="btn" data-act="restart">Work it again</button>`;
+      else {
+        const f = this.cur();
+        a = f.stage === "units"
+          ? `<button class="btn primary" data-act="step">Check this step</button><button class="btn" data-act="hint">Hint</button><button class="btn quiet" data-act="show">Show next step</button>`
+          : `<button class="btn primary" data-act="values">Check values</button><button class="btn" data-act="hint">Hint</button>`;
+        a += `<button class="btn quiet" data-act="restart">Start over</button>`;
+      }
+    } else if (this.mode === "calc") {
+      if (!this.calcStarted) a = `<button class="btn primary" data-act="calcStart">Start building</button><span class="help">Enter your starting quantity and target units first.</span>`;
+      else if (this.complete) a = `<button class="btn primary" data-act="newCalc">New calculation</button>`;
+      else {
+        a = this.cur().stage === "units"
+          ? `<button class="btn primary" data-act="step">Check this step</button><button class="btn" data-act="hint">Hint</button>`
+          : `<button class="btn primary" data-act="values">Check values</button><button class="btn" data-act="hint">Hint</button>`;
+        a += `<button class="btn quiet" data-act="newCalc">Change start or target</button>`;
+      }
+    } else if (this.mode === "author") {
+      a = `<button class="btn primary" data-act="verify">Verify solution</button>`;
+    }
+    const msgs = this.msgs.map(m => `<div class="msg ${m.type}" role="status">${m.html}</div>`).join("");
+    this.el.innerHTML = `<div class="chain">${h}</div><div class="bar" style="margin-top:12px">${a}</div><div class="msgs" style="margin-top:12px">${msgs}</div>`;
+  }
+}
+
+/* ---------- problem card ---------- */
+function problemCard(p) {
+  if (!p) return "";
+  const extra = [];
+  if (p.equation) extra.push(esc(p.equation.replace(/->/g, "→")));
+  (p.given || []).forEach(g => extra.push(esc(g)));
+  return `<div class="problem">${p.topic ? `<span class="topic">${esc(p.topic)}</span>` : ""}<p>${esc(p.prompt)}</p>${extra.length ? `<span class="meta">Given: ${extra.join(" · ")}</span>` : ""}</div>`;
+}
+
+/* ---------- Solve tab ---------- */
+const solver = new Chain($("#solve-chain"), "solver");
+function fillSolvePick() {
+  const sel = $("#solve-pick"), cur = sel.value;
+  const ps = allProblems();
+  sel.innerHTML = `<option value="">Your own problem</option>` + groupOptions(ps);
+  sel.value = ps.some(p => p.id === cur) ? cur : "";
+}
+function groupOptions(ps) {
+  const by = {};
+  ps.forEach(p => (by[p.topic || "Other"] ||= []).push(p));
+  return Object.keys(by).map(t => `<optgroup label="${esc(t)}">${by[t].map(p => `<option value="${esc(p.id)}">${esc(p.prompt.length > 70 ? p.prompt.slice(0, 68) + "…" : p.prompt)}</option>`).join("")}</optgroup>`).join("");
+}
+$("#solve-pick").addEventListener("change", (e) => {
+  const p = allProblems().find(x => x.id === e.target.value) || null;
+  $("#solve-problem").innerHTML = problemCard(p);
+  solver.reset(p);
+});
+
+/* ---------- Tutor tab ---------- */
+const stats = { solved: 0, steps: 0, clean: 0, hints: 0 };
+function drawScore() {
+  $("#tutor-score").innerHTML = `<span><b>${stats.solved}</b> solved</span><span><b>${stats.clean}/${stats.steps}</b> steps right first try</span><span><b>${stats.hints}</b> hints</span>`;
+}
+let tutorIdx = -1;
+const tutor = new Chain($("#tutor-chain"), "tutor", {
+  stat: (k) => { stats[k]++; drawScore(); },
+  next: () => nextTutor()
+});
+function tutorPool() { const t = $("#tutor-topic").value; return allProblems().filter(p => !t || p.topic === t); }
+function fillTopics() {
+  const sel = $("#tutor-topic"), cur = sel.value;
+  const ts = [...new Set(allProblems().map(p => p.topic || "Other"))];
+  sel.innerHTML = `<option value="">All topics</option>` + ts.map(t => `<option>${esc(t)}</option>`).join("");
+  sel.value = ts.includes(cur) ? cur : "";
+  $("#topics").innerHTML = [...new Set([...TOPICS, ...ts])].map(t => `<option value="${esc(t)}">`).join("");
+}
+function nextTutor() {
+  const pool = tutorPool();
+  if (!pool.length) { $("#tutor-problem").innerHTML = `<p class="empty">No problems in this topic yet.</p>`; tutor.reset(null); return; }
+  tutorIdx = (tutorIdx + 1) % pool.length;
+  const p = pool[tutorIdx];
+  $("#tutor-problem").innerHTML = problemCard(p);
+  tutor.reset(p);
+  tutor.msgs = [{ type: "info", html: `Start from <code>${esc(p.start)}</code> and build one factor at a time until you reach <code>${esc(UE.mapText(UE.parseExpr(p.target).map))}</code>. Type the units first.` }];
+  tutor.render();
+}
+$("#tutor-next").addEventListener("click", nextTutor);
+$("#tutor-topic").addEventListener("change", () => { tutorIdx = -1; nextTutor(); });
+
+/* ---------- FL Calculator tab ---------- */
+const calcGiven = () => $("#calc-given").value.split(/[;\n]/).map(x => x.trim()).filter(Boolean);
+const calc = new Chain($("#calc-chain"), "calc", { given: calcGiven });
+
+/* ---------- Bank tab ---------- */
+let editingId = null;
+const draft = () => ({
+  given: $("#b-given").value.split("\n").map(s => s.trim()).filter(Boolean),
+  equation: $("#b-equation").value.trim()
+});
+const author = new Chain($("#bank-chain"), "author", {
+  draft,
+  onDirty: () => { $("#b-save").disabled = true; },
+  onVerified: (v) => { $("#b-save").disabled = !v || !$("#b-prompt").value.trim(); }
+});
+["#b-given", "#b-equation"].forEach(s => $(s).addEventListener("input", () => { author.verified = null; $("#b-save").disabled = true; }));
+$("#b-prompt").addEventListener("input", () => { $("#b-save").disabled = !author.verified || !$("#b-prompt").value.trim(); });
+
+function clearForm() {
+  editingId = null;
+  ["#b-prompt", "#b-topic", "#b-equation", "#b-given", "#b-hint"].forEach(s => $(s).value = "");
+  author.reset(null);
+  $("#b-save").disabled = true; $("#bank-h").textContent = "New problem"; $("#b-status").textContent = "";
+}
+function loadForm(p, asCopy) {
+  editingId = asCopy ? null : p.id;
+  $("#b-prompt").value = p.prompt || ""; $("#b-topic").value = p.topic || "";
+  $("#b-equation").value = p.equation || ""; $("#b-given").value = (p.given || []).join("\n"); $("#b-hint").value = p.hint || "";
+  author.reset(null);
+  author.start = p.start; author.target = p.target;
+  author.factors = (p.solution || []).map(s => ({ ...blank(), ...s, exp: s.exp || 1 }));
+  if (!author.factors.length) author.factors = [blank()];
+  author.render();
+  $("#b-save").disabled = true;
+  $("#bank-h").textContent = asCopy ? "New problem (copied)" : "Edit problem";
+  $("#b-status").textContent = "Verify the solution before saving.";
+  $("#bank-h").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+$("#b-clear").addEventListener("click", clearForm);
+$("#b-save").addEventListener("click", async () => {
+  if (!store.db || !author.verified) return;
+  const doc = {
+    prompt: $("#b-prompt").value.trim(), topic: $("#b-topic").value.trim() || "Other",
+    start: author.start.trim(), target: author.target.trim(),
+    given: draft().given, equation: draft().equation, hint: $("#b-hint").value.trim(),
+    solution: author.verified.solution, answer: author.verified.answer, updatedAt: Date.now()
+  };
+  $("#b-save").disabled = true; $("#b-status").textContent = "Saving…";
+  try {
+    const col = store.db.collection("data/bank/problems");
+    if (editingId) await col.doc(editingId).set({ ...doc, createdAt: (store.saved.find(p => p.id === editingId) || {}).createdAt || Date.now() });
+    else await col.add({ ...doc, createdAt: Date.now() });
+    clearForm(); $("#b-status").textContent = "Saved. Students can use it now.";
+  } catch (e) {
+    $("#b-status").textContent = e && e.code === "quota_exceeded" ? "The problem bank is full. Delete some problems first." : "Couldn't save. Try again in a moment.";
+    $("#b-save").disabled = false;
+  }
+});
+let confirmDel = null;
+function drawBank() {
+  const mine = [...store.saved].sort((a, b) => (a.topic || "").localeCompare(b.topic || "") || (a.createdAt || 0) - (b.createdAt || 0));
+  $("#bank-mine").innerHTML = mine.length ? mine.map(p => `<div class="item"><div class="t"><p><span class="pill mine">${esc(p.topic)}</span>${esc(p.prompt)}</p><span class="m">${esc(p.start)} → ${esc(p.target)} · answer ${esc(UE.fmt(p.answer))}</span></div>
+    <div class="bar">${confirmDel === p.id ? `<button class="btn" data-del="${esc(p.id)}" style="color:var(--cancel)">Confirm delete</button><button class="btn quiet" data-nodel="1">Keep</button>` : `<button class="btn" data-edit="${esc(p.id)}">Edit</button><button class="btn quiet" data-ask="${esc(p.id)}">Delete</button>`}</div></div>`).join("")
+    : `<p class="empty">No problems yet. Write one above, or copy a built-in problem to start from it.</p>`;
+  $("#bank-builtin").innerHTML = BUILTIN.map(p => { const hid = store.hidden.includes(p.id); return `<div class="item${hid ? " hidden-b" : ""}"><div class="t"><p><span class="pill">${esc(p.topic)}</span>${esc(p.prompt)}</p><span class="m">${esc(p.start)} → ${esc(p.target)} · answer ${esc(UE.fmt(p.answer))}${hid ? " · hidden from students" : ""}</span></div>
+    <div class="bar"><button class="btn quiet" data-copy="${p.id}">Copy</button><button class="btn" data-hide="${p.id}">${hid ? "Show" : "Hide"}</button></div></div>`; }).join("");
+}
+$("#p-bank").addEventListener("click", async (e) => {
+  const t = e.target.closest("button"); if (!t) return;
+  const d = t.dataset;
+  if (d.edit) loadForm(store.saved.find(p => p.id === d.edit), false);
+  else if (d.copy) loadForm(BUILTIN.find(p => p.id === d.copy), true);
+  else if (d.ask) { confirmDel = d.ask; drawBank(); }
+  else if (d.nodel) { confirmDel = null; drawBank(); }
+  else if (d.del) { confirmDel = null; try { await store.db.collection("data/bank/problems").doc(d.del).delete(); if (editingId === d.del) clearForm(); } catch (_) { $("#b-status").textContent = "Couldn't delete. Try again."; } }
+  else if (d.hide) {
+    const h = store.hidden.includes(d.hide) ? store.hidden.filter(x => x !== d.hide) : [...store.hidden, d.hide];
+    try { await store.db.doc("data/bank/config/main").set({ hidden: h }); } catch (_) { $("#b-status").textContent = "Couldn't update. Try again."; }
+  }
+});
+
+/* ---------- tabs ---------- */
+function showTab(name) {
+  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
+  ["solve", "tutor", "calc", "bank"].forEach(n => $("#p-" + n).hidden = n !== name);
+  if (name === "tutor" && !tutor.problem) nextTutor();
+}
+document.querySelector("nav.tabs").addEventListener("click", (e) => { const b = e.target.closest("button[data-tab]"); if (b) showTab(b.dataset.tab); });
+
+/* ---------- refresh on data change ---------- */
+store.listeners.push(() => {
+  fillSolvePick(); fillTopics(); if (store.canAuthor) drawBank();
+  // keep current problems in sync if they changed or vanished
+  if (solver.problem && !allProblems().some(p => p.id === solver.problem.id)) { $("#solve-pick").value = ""; $("#solve-problem").innerHTML = ""; solver.reset(null); }
+});
+fillSolvePick(); fillTopics(); drawScore();
+
+/* ---------- capabilities ---------- */
+(async () => {
+  const cl = window.claude;
+  if (!cl || !cl.use) return;
+  const [user, db] = await Promise.all([cl.use("user"), cl.use("db")]);
+  store.canAuthor = user ? await user.canEdit() : false;
+  store.db = db;
+  if (store.canAuthor && db) { $("#tab-bank").hidden = false; drawBank(); }
+  if (!db) return;
+  db.collection("data/bank/problems").onSnapshot((snap) => {
+    store.saved = snap.docs.map(d => {
+      const p = d.data();
+      return { id: d.id, prompt: String(p.prompt || ""), topic: String(p.topic || "Other"), start: String(p.start || ""), target: String(p.target || ""),
+        given: Array.isArray(p.given) ? p.given.map(String) : [], equation: String(p.equation || ""), hint: String(p.hint || ""),
+        solution: Array.isArray(p.solution) ? p.solution.map(s => ({ num: String(s.num || ""), den: String(s.den || ""), exp: +s.exp || 1, nv: String(s.nv || ""), dv: String(s.dv || "") })) : [],
+        answer: +p.answer, createdAt: +p.createdAt || 0 };
+    }).filter(p => p.start && p.target && p.prompt);
+    onProblemsChange();
+  }, () => {});
+  db.doc("data/bank/config/main").onSnapshot((snap) => {
+    const d = snap.exists ? snap.data() : {};
+    store.hidden = Array.isArray(d.hidden) ? d.hidden.map(String) : [];
+    onProblemsChange();
+  }, () => {});
+})();
+/* ---------- Upload problems from a spreadsheet ---------- */
+const COLS = {
+  prompt: ["prompt", "problem", "statement", "question", "problem statement"],
+  topic: ["topic", "category", "unit"],
+  start: ["start", "starting quantity", "given quantity", "from"],
+  target: ["target", "target units", "answer units", "to"],
+  solution: ["solution", "worked solution", "factors", "chain"],
+  given: ["given", "given relationships", "relationships", "data"],
+  equation: ["equation", "balanced equation", "reaction"],
+  hint: ["hint", "hints"]
+};
+const norm = (s) => String(s ?? "").replace(/^﻿/, "").trim().toLowerCase().replace(/[_\s]+/g, " ");
+
+function parseCSV(text) {
+  const rows = []; let row = [], cell = "", q = false;
+  text = text.replace(/^﻿/, "");
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
+      else cell += c;
+    } else if (c === '"') q = true;
+    else if (c === ",") { row.push(cell); cell = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(cell); rows.push(row); row = []; cell = ""; }
+    else cell += c;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter(r => r.some(c => String(c).trim()));
+}
+function splitQty(s) {
+  const m = String(s).trim().match(/^([+-]?(?:\d[\d,]*\.?\d*|\.\d+)(?:\s*e[+-]?\d+|\s*[x×*·]\s*10\s*\^\s*\(?[+-]?\d+\)?|\s*[x×*·]\s*10[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)?)\s+(.+)$/i);
+  if (!m || !isFinite(UE.parseNum(m[1]))) return null;
+  return { num: m[1].trim(), unit: m[2].trim() };
+}
+function parseSolution(str) {
+  const factors = [];
+  for (let part of String(str || "").split(/[;\n]/)) {
+    part = part.trim();
+    if (!part) continue;
+    let exp = 1;
+    const pm = part.match(/^\((.*)\)\s*(?:\^\s*(\d)|([²³]))\s*$/);
+    if (pm) { part = pm[1].trim(); exp = pm[2] ? +pm[2] : (pm[3] === "²" ? 2 : 3); }
+    const sp = part.split(/\s*\/\s*(?=[+-]?(?:\d|\.\d))/);
+    const top = sp.length === 2 && splitQty(sp[0]), bot = sp.length === 2 && splitQty(sp[1]);
+    if (!top || !bot) return { error: `Can't read the factor “${part}”. Write it as top / bottom with a number before each unit, like 1609 m / 1 mi.` };
+    factors.push({ num: top.unit, den: bot.unit, exp, nv: top.num, dv: bot.num });
+  }
+  return { factors };
+}
+function factorText(f) {
+  const t = `${f.nv} ${f.num} / ${f.dv} ${f.den}`;
+  return (f.exp || 1) > 1 ? `(${t})^${f.exp}` : t;
+}
+function validateProblem(p) {
+  const errors = [], warnings = [];
+  if (!p.prompt) errors.push("The problem statement is missing.");
+  const s = UE.parseQty(p.start), t = UE.parseExpr(p.target);
+  if (!p.start) errors.push("The starting quantity is missing.");
+  else if (s.error) errors.push("Starting quantity: " + s.error);
+  if (!p.target) errors.push("The target units are missing.");
+  else if (t.error) errors.push("Target units: " + t.error);
+  for (const g of p.given) if (!UE.parseRelation(g)) errors.push(`Can't read the given relationship “${g}”. Write it like 1.84 g H2SO4 = 1 mL H2SO4.`);
+  if (p.equation && !UE.parseEquation(p.equation)) errors.push(`Can't read the equation “${p.equation}”. Write it like 2 H2 + O2 -> 2 H2O.`);
+  if (p.solutionError) errors.push(p.solutionError);
+  else if (!p.solution.length) errors.push("The worked solution is missing. Students need it for tutor hints and answer checks.");
+  if (errors.length) return { errors, warnings };
+  const ctx = UE.makeCtx(p);
+  let m = s.map, v = s.value;
+  p.solution.forEach((f, i) => {
+    const pf = parseFactor({ ...blank(), ...f });
+    if (pf.error) { errors.push(`Factor ${i + 1}: ${pf.error}`); return; }
+    m = UE.mulMap(m, pf.map);
+    const nv = UE.parseNum(f.nv), dv = UE.parseNum(f.dv);
+    const c = UE.checkFactor(pf.numMap, nv, pf.denMap, dv, ctx);
+    if (c.status === "bad") errors.push(`Factor ${i + 1}: ${f.nv} ${UE.mapText(pf.numMap)} doesn't equal ${f.dv} ${UE.mapText(pf.denMap)}. Expected ${UE.fmt(c.expected)} ${UE.mapText(pf.denMap)}.`);
+    else if (c.status === "empty") errors.push(`Factor ${i + 1} needs a nonzero number on top and bottom.`);
+    else {
+      if (c.status === "unknown") warnings.push(`Factor ${i + 1} can't be verified. If it comes from the problem's data, add it to the given column.`);
+      v *= Math.pow(nv / dv, f.exp);
+    }
+  });
+  if (!errors.length && !UE.eqMap(m, t.map)) errors.push(`The solution's units come out as ${UE.mapText(m)}, not ${UE.mapText(t.map)}.`);
+  return { errors, warnings, answer: v };
+}
+function rowsToProblems(rows) {
+  if (!rows.length) return { error: "The file is empty." };
+  const head = rows[0].map(norm);
+  const idx = {};
+  for (const k in COLS) idx[k] = head.findIndex(h => COLS[k].includes(h));
+  const missing = ["prompt", "start", "target", "solution"].filter(k => idx[k] < 0);
+  if (missing.length) return { error: `The first row must name the columns. Missing: ${missing.join(", ")}. Download the template to see the layout.` };
+  const seen = new Set([...BUILTIN, ...store.saved].map(p => norm(p.prompt)));
+  const out = [];
+  rows.slice(1).forEach((r, n) => {
+    const get = (k) => idx[k] >= 0 ? String(r[idx[k]] ?? "").trim() : "";
+    const sol = parseSolution(get("solution"));
+    const p = {
+      prompt: get("prompt"), topic: get("topic") || "Other", start: get("start"), target: get("target"),
+      given: get("given").split(/[;\n]/).map(x => x.trim()).filter(Boolean),
+      equation: get("equation"), hint: get("hint"),
+      solution: sol.factors || [], solutionError: sol.error, row: n + 2
+    };
+    const v = validateProblem(p);
+    p.errors = v.errors; p.warnings = v.warnings; p.answer = v.answer;
+    p.dup = !!p.prompt && seen.has(norm(p.prompt));
+    if (p.prompt) seen.add(norm(p.prompt));
+    out.push(p);
+  });
+  return { problems: out };
+}
+
+let sheetLib = null;
+function loadSheetLib() {
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  if (sheetLib) return sheetLib;
+  sheetLib = new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+    s.onload = () => res(window.XLSX); s.onerror = () => { sheetLib = null; rej(new Error("load")); };
+    document.head.appendChild(s);
+  });
+  return sheetLib;
+}
+
+let pending = [];
+async function readFile(file) {
+  $("#u-name").textContent = file.name;
+  $("#u-status").textContent = "";
+  let rows;
+  try {
+    if (/\.(xlsx|xls)$/i.test(file.name)) {
+      const X = await loadSheetLib();
+      const wb = X.read(await file.arrayBuffer(), { type: "array" });
+      rows = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: "", raw: false })
+        .filter(r => r.some(c => String(c).trim()));
+    } else rows = parseCSV(await file.text());
+  } catch (e) {
+    pending = []; drawUpload(e && e.message === "load" ? "Couldn't load the Excel reader. Check your connection, or save the sheet as CSV and upload that." : "Couldn't read that file. Upload an .xlsx or .csv spreadsheet.");
+    return;
+  }
+  const r = rowsToProblems(rows);
+  pending = r.problems || [];
+  drawUpload(r.error);
+}
+function drawUpload(err) {
+  const ready = pending.filter(p => !p.errors.length && !p.dup);
+  const bad = pending.filter(p => p.errors.length), dup = pending.filter(p => !p.errors.length && p.dup);
+  let h = err ? `<div class="msg bad">${esc(err)}</div>` : "";
+  if (pending.length) {
+    h += `<div class="msg ${bad.length ? "warn" : "ok"}">${pending.length} row${pending.length > 1 ? "s" : ""} read: <b>${ready.length} ready</b>${bad.length ? `, ${bad.length} need fixing` : ""}${dup.length ? `, ${dup.length} already in the bank (skipped)` : ""}.${bad.length ? " Fix those rows in your file and upload it again; the ready rows import either way." : ""}</div>`;
+    h += [...bad, ...ready, ...dup].map(p => {
+      const st = p.errors.length ? `<span class="pill badp">Row ${p.row} · needs fixing</span>` : p.dup ? `<span class="pill">Row ${p.row} · duplicate</span>` : `<span class="pill okp">Row ${p.row} · ready</span>`;
+      const notes = [...p.errors.map(e => `<li class="e">${esc(e)}</li>`), ...p.warnings.map(w => `<li class="w">${esc(w)}</li>`)].join("");
+      return `<div class="item"><div class="t"><p>${st}${esc(p.prompt || "(no statement)")}</p><span class="m">${esc(p.topic)} · ${esc(p.start)} → ${esc(p.target)}${p.answer != null && !p.errors.length ? " · answer " + esc(UE.fmt(p.answer)) : ""}</span>${notes ? `<ul class="notes">${notes}</ul>` : ""}</div></div>`;
+    }).join("");
+  }
+  $("#u-preview").innerHTML = h;
+  $("#u-actions").hidden = !ready.length;
+  $("#u-import").textContent = `Import ${ready.length} problem${ready.length === 1 ? "" : "s"}`;
+}
+$("#u-file").addEventListener("change", (e) => { const f = e.target.files[0]; if (f) readFile(f); e.target.value = ""; });
+$("#u-import").addEventListener("click", async () => {
+  const ready = pending.filter(p => !p.errors.length && !p.dup);
+  if (!store.db || !ready.length) return;
+  const btn = $("#u-import"); btn.disabled = true;
+  const col = store.db.collection("data/bank/problems");
+  let done = 0;
+  try {
+    for (const p of ready) {
+      $("#u-status").textContent = `Importing ${done + 1} of ${ready.length}…`;
+      await col.add({ prompt: p.prompt, topic: p.topic, start: p.start, target: p.target, given: p.given, equation: p.equation, hint: p.hint,
+        solution: p.solution, answer: p.answer, createdAt: Date.now() + done, updatedAt: Date.now() });
+      p.dup = true; done++;
+    }
+    $("#u-status").textContent = `Imported ${done} problem${done === 1 ? "" : "s"}. Students can use them now.`;
+    pending = pending.filter(p => p.errors.length);
+    drawUpload();
+    $("#u-actions").hidden = false; $("#u-import").hidden = true;
+  } catch (e) {
+    $("#u-status").textContent = (e && e.code === "quota_exceeded" ? "The problem bank is full. " : "The import stopped. ") + `${done} of ${ready.length} were saved; upload the file again to import the rest (saved ones are skipped).`;
+  }
+  btn.disabled = false;
+});
+$("#u-file").addEventListener("click", () => { $("#u-import").hidden = false; });
+
+const TEMPLATE_ROWS = [
+  ["A marathon is 26.2 mi long. How long is it in kilometers?", "English ↔ metric", "26.2 mi", "km", "1609 m / 1 mi; 1 km / 1000 m", "", "", ""],
+  ["A shipping box holds 0.250 m³. What is its volume in cm³?", "Area & volume", "0.250 m^3", "cm^3", "(100 cm / 1 m)^3", "", "", "Cube the meter-to-centimeter factor so m³ cancels."],
+  ["Ethanol has a density of 0.789 g/mL. What volume, in mL, does 50.0 g of ethanol occupy?", "Density", "50.0 g ethanol", "mL ethanol", "1 mL ethanol / 0.789 g ethanol", "0.789 g ethanol = 1 mL ethanol", "", "Flip the density so grams cancel."],
+  ["Methane burns: CH4 + 2 O2 → CO2 + 2 H2O. How many grams of CO2 form from 10.0 g of CH4?", "Stoichiometry", "10.0 g CH4", "g CO2", "1 mol CH4 / 16.04 g CH4; 1 mol CO2 / 1 mol CH4; 44.01 g CO2 / 1 mol CO2", "", "CH4 + 2 O2 -> CO2 + 2 H2O", "Grams → moles → mole ratio → grams."]
+];
+function templateCSV() {
+  const q = (s) => /[",\n]/.test(s) ? `"${String(s).replace(/"/g, '""')}"` : String(s);
+  const rows = [["prompt", "topic", "start", "target", "solution", "given", "equation", "hint"], ...TEMPLATE_ROWS];
+  return "\uFEFF" + rows.map(r => r.map(q).join(",")).join("\r\n") + "\r\n";
+}
+(async () => {
+  const cl = window.claude;
+  if (!cl || !cl.use) return;
+  const dl = await cl.use("downloads");
+  if (!dl) return;
+  const b = $("#u-template"); b.hidden = false;
+  b.addEventListener("click", async () => {
+    try { await dl.save({ filename: "factor-label-problems-template.csv", data: templateCSV() }); }
+    catch (e) { if (e && e.code !== "declined") $("#u-status").textContent = "The template couldn't be downloaded here."; }
+  });
+})();
+</script>
+</body>
+</html>
