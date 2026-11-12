@@ -1,0 +1,101 @@
+﻿prompt,topic,start,target,solution,given,equation,hint
+A red blood cell is about 7.5 μm across. What is its diameter in meters?,Metric prefixes,7.5 μm,m,1 m / 1e6 μm,,,Micro means one-millionth: 1 m = 10⁶ μm.
+A vitamin C tablet contains 250 mg of ascorbic acid. How many grams is that?,Metric prefixes,250 mg,g,1 g / 1000 mg,,,
+A green laser pointer emits light with a wavelength of 532 nm. Express the wavelength in micrometers.,Metric prefixes,532 nm,μm,1 m / 1e9 nm; 1e6 μm / 1 m,,,Go through meters: nm → m → μm.
+A water bottle holds 0.750 L. How many milliliters does it hold?,Metric prefixes,0.750 L,mL,1000 mL / 1 L,,,
+A forensic lab recovers 3.2 ng of DNA from a sample. What is that mass in milligrams?,Metric prefixes,3.2 ng,mg,1 g / 1e9 ng; 1000 mg / 1 g,,,Convert nanograms to grams first.
+A micropipette delivers 25.00 μL. What is that volume in liters?,Metric prefixes,25.00 μL,L,1 L / 1e6 μL,,,
+Mount Everest is 8.849 km tall. What is its height in centimeters?,Metric prefixes,8.849 km,cm,1000 m / 1 km; 100 cm / 1 m,,,
+A camera shutter stays open for 4.0 ms. How many microseconds is that?,Metric prefixes,4.0 ms,μs,1 s / 1000 ms; 1e6 μs / 1 s,,,
+A carbon–carbon single bond is 154 pm long. Express the bond length in nanometers.,Metric prefixes,154 pm,nm,1 m / 1e12 pm; 1e9 nm / 1 m,,,Pico is 10⁻¹² and nano is 10⁻⁹. Go through meters.
+A daily dose of a thyroid medication is 0.125 mg. How many micrograms is that?,Metric prefixes,0.125 mg,μg,1 g / 1000 mg; 1e6 μg / 1 g,,,
+A lightning bolt releases about 1.0 GJ of energy. How many kilojoules is that?,Metric prefixes,1.0 GJ,kJ,1e9 J / 1 GJ; 1 kJ / 1000 J,,,
+An American football field is 100. yd long. How long is it in meters?,English ↔ metric,100. yd,m,3 ft / 1 yd; 12 in / 1 ft; 2.54 cm / 1 in; 1 m / 100 cm,,,The only exact English–metric link you need is 1 in = 2.54 cm.
+A newborn baby weighs 7.5 lb. What is the baby's mass in kilograms?,English ↔ metric,7.5 lb,kg,453.6 g / 1 lb; 1 kg / 1000 g,,,
+A car's gas tank holds 15.0 gal. How many liters is that?,English ↔ metric,15.0 gal,L,3.785 L / 1 gal,,,
+A runner finishes a 10.0 km race. How many miles did she run?,English ↔ metric,10.0 km,mi,1000 m / 1 km; 1 mi / 1609 m,,,
+A recipe calls for 8.0 oz of chocolate. How many grams is that?,English ↔ metric,8.0 oz,g,28.35 g / 1 oz,,,
+A student is 5.75 ft tall. What is her height in centimeters?,English ↔ metric,5.75 ft,cm,12 in / 1 ft; 2.54 cm / 1 in,,,
+A soda can holds 12.0 fl oz. What is that volume in milliliters?,English ↔ metric,12.0 fl oz,mL,29.57 mL / 1 fl oz,,,
+A bag of rice has a mass of 2.00 kg. How many pounds is that?,English ↔ metric,2.00 kg,lb,2.205 lb / 1 kg,,,
+A backyard swimming pool holds 20000 gal of water. What is that volume in cubic meters?,English ↔ metric,20000 gal,m^3,3.785 L / 1 gal; 1 m^3 / 1000 L,,,1 m³ = 1000 L.
+A hiking trail climbs 3500 ft. How many meters of elevation is that?,English ↔ metric,3500 ft,m,12 in / 1 ft; 2.54 cm / 1 in; 1 m / 100 cm,,,
+A carton holds 1.00 qt of milk. How many milliliters is that?,English ↔ metric,1.00 qt,mL,946.4 mL / 1 qt,,,
+The speed of sound in air is about 343 m/s. Express this speed in km/h.,Rates,343 m/s,km/h,1 km / 1000 m; 60 s / 1 min; 60 min / 1 h,,,"Seconds are on the bottom, so put s on top of a factor to cancel it."
+A hybrid car gets 32 mi/gal. What is its fuel economy in km/L?,Rates,32 mi/gal,km/L,1.609 km / 1 mi; 1 gal / 3.785 L,,,
+A leaky faucet drips 0.50 mL/s. How many liters does it waste per day?,Rates,0.50 mL/s,L/day,1 L / 1000 mL; 60 s / 1 min; 60 min / 1 h; 24 h / 1 day,,,
+Light travels at 3.00 × 10⁸ m/s. How many miles does it travel each second?,Rates,3.00e8 m/s,mi/s,1 mi / 1609 m,,,
+A cheetah can sprint at 29 m/s. What is that speed in mi/h?,Rates,29 m/s,mi/h,1 mi / 1609 m; 60 s / 1 min; 60 min / 1 h,,,
+Human hair grows about 0.35 mm/day. How many inches does it grow per year?,Rates,0.35 mm/day,in/yr,1 cm / 10 mm; 1 in / 2.54 cm; 365 day / 1 yr,,,
+A sump pump moves 15 gal/min. What is the flow rate in L/s?,Rates,15 gal/min,L/s,3.785 L / 1 gal; 1 min / 60 s,,,
+A glacier creeps forward 0.80 ft/day. How many meters does it move per year?,Rates,0.80 ft/day,m/yr,12 in / 1 ft; 2.54 cm / 1 in; 1 m / 100 cm; 365 day / 1 yr,,,
+An airliner cruises at 560 mi/h. What is its speed in m/s?,Rates,560 mi/h,m/s,1609 m / 1 mi; 1 h / 60 min; 1 min / 60 s,,,
+The acceleration due to gravity is 9.81 m/s². Express it in ft/s².,Rates,9.81 m/s^2,ft/s^2,100 cm / 1 m; 1 in / 2.54 cm; 1 ft / 12 in,,,Only the length unit changes; s² stays as it is.
+An IV pump delivers saline at 125 mL/h. How many liters does the patient receive per day?,Rates,125 mL/h,L/day,1 L / 1000 mL; 24 h / 1 day,,,
+A sheet of letter paper has an area of 93.5 in². What is its area in cm²?,Area & volume,93.5 in^2,cm^2,(2.54 cm / 1 in)^2,,,Square the inch-to-centimeter factor so in² cancels.
+A bedroom floor measures 144 ft². What is the floor area in m²?,Area & volume,144 ft^2,m^2,(12 in / 1 ft)^2; (2.54 cm / 1 in)^2; (1 m / 100 cm)^2,,,Every length factor must be squared.
+A sugar cube has a volume of 1.0 cm³. What is its volume in mm³?,Area & volume,1.0 cm^3,mm^3,(10 mm / 1 cm)^3,,,
+An aquarium holds 55.0 gal. What is its volume in cm³?,Area & volume,55.0 gal,cm^3,3.785 L / 1 gal; 1000 mL / 1 L; 1 cm^3 / 1 mL,,,1 mL = 1 cm³ exactly.
+One acre is 43560 ft². What is an acre in m²?,Area & volume,43560 ft^2,m^2,(12 in / 1 ft)^2; (2.54 cm / 1 in)^2; (1 m / 100 cm)^2,,,
+A gold cube has a volume of 8.00 cm³. What is its volume in in³?,Area & volume,8.00 cm^3,in^3,(1 in / 2.54 cm)^3,,,
+A competition pool holds 450 m³ of water. How many liters is that?,Area & volume,450 m^3,L,(100 cm / 1 m)^3; 1 mL / 1 cm^3; 1 L / 1000 mL,,,
+A computer chip has an area of 1.5 cm². What is its area in mm²?,Area & volume,1.5 cm^2,mm^2,(10 mm / 1 cm)^2,,,
+A car engine displaces 2.4 L. What is the displacement in in³?,Area & volume,2.4 L,in^3,1000 mL / 1 L; 1 cm^3 / 1 mL; (1 in / 2.54 cm)^3,,,
+A typical animal cell has a volume of about 2.0 × 10³ μm³. What is that volume in cm³?,Area & volume,2.0e3 μm^3,cm^3,(1 m / 1e6 μm)^3; (100 cm / 1 m)^3,,,
+A small lake covers 3.2 km². What is its area in m²?,Area & volume,3.2 km^2,m^2,(1000 m / 1 km)^2,,,
+A bicycle tire is inflated to 32 psi. What is the pressure in atmospheres?,Pressure & energy,32 psi,atm,1 atm / 14.70 psi,,,
+A weather report gives the air pressure as 1013 hPa. What is that in atmospheres?,Pressure & energy,1013 hPa,atm,100 Pa / 1 hPa; 1 atm / 101325 Pa,,,
+A normal systolic blood pressure is 120 mmHg. Express it in kilopascals.,Pressure & energy,120 mmHg,kPa,1 atm / 760 mmHg; 101.3 kPa / 1 atm,,,
+A gas cylinder is at 2.50 atm. What is the pressure in torr?,Pressure & energy,2.50 atm,torr,760 torr / 1 atm,,,
+The air pressure at the surface of Mars is about 0.60 kPa. What is that in atmospheres?,Pressure & energy,0.60 kPa,atm,1 atm / 101.3 kPa,,,
+Burning a wooden match releases about 1.0 kJ of energy. How many calories is that?,Pressure & energy,1.0 kJ,cal,1000 J / 1 kJ; 1 cal / 4.184 J,,,
+A slice of pizza contains 285 Cal (food Calories). What is that energy in kilojoules?,Pressure & energy,285 Cal,kJ,4.184 kJ / 1 Cal,,,1 food Calorie = 1 kcal = 4.184 kJ.
+Heating a mug of water to boiling takes 25.0 kcal. How many joules is that?,Pressure & energy,25.0 kcal,J,4184 J / 1 kcal,,,
+A laptop battery stores 50. kJ of energy. What is that in kilocalories?,Pressure & energy,50. kJ,kcal,1 kcal / 4.184 kJ,,,
+A full scuba tank is at 3000. psi. What is the pressure in atmospheres?,Pressure & energy,3000. psi,atm,1 atm / 14.70 psi,,,
+The water pressure 1.0 km below the ocean surface is about 100. atm. What is that in megapascals?,Pressure & energy,100. atm,MPa,101325 Pa / 1 atm; 1 MPa / 1e6 Pa,,,
+Gold has a density of 19.3 g/cm³. What is the mass of a gold nugget with a volume of 5.00 cm³?,Density,5.00 cm^3 Au,g Au,19.3 g Au / 1 cm^3 Au,19.3 g Au = 1 cm^3 Au,,
+Mercury has a density of 13.6 g/mL. What volume does 100. g of mercury occupy?,Density,100. g Hg,mL Hg,1 mL Hg / 13.6 g Hg,13.6 g Hg = 1 mL Hg,,Flip the density so grams cancel.
+"Aluminum has a density of 2.70 g/cm³. What is the mass, in kilograms, of an aluminum block with a volume of 250. cm³?",Density,250. cm^3 Al,kg Al,2.70 g Al / 1 cm^3 Al; 1 kg Al / 1000 g Al,2.70 g Al = 1 cm^3 Al,,
+Olive oil has a density of 0.918 g/mL. What is the mass of 1.00 L of olive oil in grams?,Density,1.00 L oil,g oil,1000 mL oil / 1 L oil; 0.918 g oil / 1 mL oil,0.918 g oil = 1 mL oil,,"Density uses mL, so convert L to mL first."
+"Air at room temperature has a density of 1.20 g/L. What is the mass, in kilograms, of the air in a classroom with a volume of 50.0 m³?",Density,50.0 m^3 air,kg air,1000 L air / 1 m^3 air; 1.20 g air / 1 L air; 1 kg air / 1000 g air,1.20 g air = 1 L air,,
+"Lead has a density of 11.3 g/cm³. What is the volume, in cm³, of a 1.00 lb lead fishing weight?",Density,1.00 lb Pb,cm^3 Pb,453.6 g Pb / 1 lb Pb; 1 cm^3 Pb / 11.3 g Pb,11.3 g Pb = 1 cm^3 Pb,,
+"Gasoline has a density of 0.74 g/mL. What is the mass, in kilograms, of 15.0 gal of gasoline?",Density,15.0 gal gasoline,kg gasoline,3.785 L gasoline / 1 gal gasoline; 1000 mL gasoline / 1 L gasoline; 0.74 g gasoline / 1 mL gasoline; 1 kg gasoline / 1000 g gasoline,0.74 g gasoline = 1 mL gasoline,,
+"Seawater has a density of 1.025 g/mL. What is the mass, in kilograms, of 2.00 L of seawater?",Density,2.00 L seawater,kg seawater,1000 mL seawater / 1 L seawater; 1.025 g seawater / 1 mL seawater; 1 kg seawater / 1000 g seawater,1.025 g seawater = 1 mL seawater,,
+A 1.00-carat diamond has a mass of 0.200 g. Diamond has a density of 3.51 g/cm³. What is the volume of the diamond in mm³?,Density,0.200 g C,mm^3 C,1 cm^3 C / 3.51 g C; (10 mm C / 1 cm C)^3,3.51 g C = 1 cm^3 C,,"Find the volume in cm³, then cube the cm-to-mm factor."
+"Osmium, the densest element, has a density of 22.6 g/cm³. What is the mass in grams of a 1.00 in³ cube of osmium?",Density,1.00 in^3 Os,g Os,(2.54 cm Os / 1 in Os)^3; 22.6 g Os / 1 cm^3 Os,22.6 g Os = 1 cm^3 Os,,
+"Helium gas at STP has a density of 0.179 g/L. What volume, in liters, does 1.00 g of helium occupy?",Density,1.00 g He,L He,1 L He / 0.179 g He,0.179 g He = 1 L He,,
+How many moles of calcium carbonate are in a 100. g piece of limestone (pure CaCO₃)?,Moles & molar mass,100. g CaCO3,mol CaCO3,1 mol CaCO3 / 100.09 g CaCO3,,,
+"What is the mass of 0.250 mol of glucose, C₆H₁₂O₆?",Moles & molar mass,0.250 mol C6H12O6,g C6H12O6,180.16 g C6H12O6 / 1 mol C6H12O6,,,
+How many gold atoms are in 1.00 g of pure gold?,Moles & molar mass,1.00 g Au,atoms Au,1 mol Au / 196.97 g Au; 6.022e23 atoms Au / 1 mol Au,,,Grams → moles → atoms.
+"What is the mass, in grams, of 3.01 × 10²³ molecules of carbon dioxide?",Moles & molar mass,3.01e23 molecules CO2,g CO2,1 mol CO2 / 6.022e23 molecules CO2; 44.01 g CO2 / 1 mol CO2,,,
+A teaspoon of baking soda (NaHCO₃) has a mass of 5.00 g. How many moles is that?,Moles & molar mass,5.00 g NaHCO3,mol NaHCO3,1 mol NaHCO3 / 84.01 g NaHCO3,,,
+"An aspirin tablet contains 325 mg of aspirin, C₉H₈O₄. How many moles of aspirin is that?",Moles & molar mass,325 mg C9H8O4,mol C9H8O4,1 g C9H8O4 / 1000 mg C9H8O4; 1 mol C9H8O4 / 180.16 g C9H8O4,,,Convert mg to g before using the molar mass.
+"What is the mass of 0.0500 mol of copper(II) sulfate pentahydrate, CuSO₄·5H₂O?",Moles & molar mass,0.0500 mol CuSO4·5H2O,g CuSO4·5H2O,249.69 g CuSO4·5H2O / 1 mol CuSO4·5H2O,,,Include the five waters of hydration in the molar mass.
+Water has a density of 1.00 g/mL. How many water molecules are in 1.00 mL of water?,Moles & molar mass,1.00 mL H2O,molecules H2O,1.00 g H2O / 1 mL H2O; 1 mol H2O / 18.02 g H2O; 6.022e23 molecules H2O / 1 mol H2O,1.00 g H2O = 1 mL H2O,,
+How many moles of iron are in a 1.00 kg iron bar?,Moles & molar mass,1.00 kg Fe,mol Fe,1000 g Fe / 1 kg Fe; 1 mol Fe / 55.85 g Fe,,,
+"What is the mass, in grams, of 2.50 × 10²² atoms of silver?",Moles & molar mass,2.50e22 atoms Ag,g Ag,1 mol Ag / 6.022e23 atoms Ag; 107.87 g Ag / 1 mol Ag,,,
+"How many moles of ammonia, NH₃, are in 34.0 g of ammonia?",Moles & molar mass,34.0 g NH3,mol NH3,1 mol NH3 / 17.03 g NH3,,,
+How many grams of NaCl are needed to make 500. mL of 0.150 M NaCl solution?,Solutions,500. mL solution,g NaCl,1 L solution / 1000 mL solution; 0.150 mol NaCl / 1 L solution; 58.44 g NaCl / 1 mol NaCl,0.150 mol NaCl = 1 L solution,,0.150 M means 0.150 mol NaCl per 1 L of solution.
+How many moles of HCl are in 25.0 mL of 0.100 M HCl?,Solutions,25.0 mL solution,mol HCl,1 L solution / 1000 mL solution; 0.100 mol HCl / 1 L solution,0.100 mol HCl = 1 L solution,,
+"What volume, in mL, of 2.00 M NaOH contains 0.0500 mol of NaOH?",Solutions,0.0500 mol NaOH,mL solution,1 L solution / 2.00 mol NaOH; 1000 mL solution / 1 L solution,2.00 mol NaOH = 1 L solution,,Flip the molarity so moles cancel.
+"What mass of glucose, C₆H₁₂O₆, is dissolved in 250. mL of 0.500 M glucose solution?",Solutions,250. mL solution,g C6H12O6,1 L solution / 1000 mL solution; 0.500 mol C6H12O6 / 1 L solution; 180.16 g C6H12O6 / 1 mol C6H12O6,0.500 mol C6H12O6 = 1 L solution,,
+How many milliliters of 6.00 M H₂SO₄ contain 0.150 mol of H₂SO₄?,Solutions,0.150 mol H2SO4,mL solution,1 L solution / 6.00 mol H2SO4; 1000 mL solution / 1 L solution,6.00 mol H2SO4 = 1 L solution,,
+How many grams of KMnO₄ are in 75.0 mL of 0.0200 M KMnO₄?,Solutions,75.0 mL solution,g KMnO4,1 L solution / 1000 mL solution; 0.0200 mol KMnO4 / 1 L solution; 158.03 g KMnO4 / 1 mol KMnO4,0.0200 mol KMnO4 = 1 L solution,,
+A sports drink is 5.0% sugar by mass. How many grams of sugar are in 500. g of the drink?,Solutions,500. g drink,g sugar,5.0 g sugar / 100 g drink,5.0 g sugar = 100 g drink,,5.0% by mass means 5.0 g sugar in every 100 g of drink.
+Vinegar is 5.0% acetic acid (HC₂H₃O₂) by mass and has a density of 1.01 g/mL. How many grams of acetic acid are in 1.00 L of vinegar?,Solutions,1.00 L vinegar,g HC2H3O2,1000 mL vinegar / 1 L vinegar; 1.01 g vinegar / 1 mL vinegar; 5.0 g HC2H3O2 / 100 g vinegar,1.01 g vinegar = 1 mL vinegar; 5.0 g HC2H3O2 = 100 g vinegar,,Volume → mass of vinegar (density) → mass of acid (percent).
+A normal fasting blood glucose level is 90. mg per deciliter of blood. How many grams of glucose are in 5.0 L of blood?,Solutions,5.0 L blood,g glucose,10 dL blood / 1 L blood; 90. mg glucose / 1 dL blood; 1 g glucose / 1000 mg glucose,90. mg glucose = 1 dL blood,,
+Calcium chloride dissolves as CaCl₂ → Ca²⁺ + 2 Cl⁻. How many moles of chloride ions are in 150. mL of 0.250 M CaCl₂?,Solutions,150. mL solution,mol Cl,1 L solution / 1000 mL solution; 0.250 mol CaCl2 / 1 L solution; 2 mol Cl / 1 mol CaCl2,0.250 mol CaCl2 = 1 L solution,CaCl2 -> Ca + 2 Cl,Each formula unit of CaCl₂ gives two Cl⁻ ions.
+Express a concentration of 0.250 mol NaCl per liter of solution in millimoles per milliliter.,Solutions,0.250 mol NaCl/L solution,mmol NaCl/mL solution,1000 mmol NaCl / 1 mol NaCl; 1 L solution / 1000 mL solution,,,Convert the top and the bottom separately.
+Hydrogen burns in oxygen: 2 H₂ + O₂ → 2 H₂O. How many moles of O₂ are needed to react with 6.0 mol of H₂?,Stoichiometry,6.0 mol H2,mol O2,1 mol O2 / 2 mol H2,,2 H2 + O2 -> 2 H2O,Use the coefficients as the mole ratio.
+"In the Haber process, N₂ + 3 H₂ → 2 NH₃. How many grams of NH₃ form from 28.0 g of N₂?",Stoichiometry,28.0 g N2,g NH3,1 mol N2 / 28.02 g N2; 2 mol NH3 / 1 mol N2; 17.03 g NH3 / 1 mol NH3,,N2 + 3 H2 -> 2 NH3,Grams → moles → mole ratio → grams.
+Propane burns in a gas grill: C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O. How many grams of CO₂ form from 44.1 g of propane?,Stoichiometry,44.1 g C3H8,g CO2,1 mol C3H8 / 44.10 g C3H8; 3 mol CO2 / 1 mol C3H8; 44.01 g CO2 / 1 mol CO2,,C3H8 + 5 O2 -> 3 CO2 + 4 H2O,
+Sodium reacts with chlorine: 2 Na + Cl₂ → 2 NaCl. How many grams of NaCl form from 10.0 g of Na?,Stoichiometry,10.0 g Na,g NaCl,1 mol Na / 22.99 g Na; 2 mol NaCl / 2 mol Na; 58.44 g NaCl / 1 mol NaCl,,2 Na + Cl2 -> 2 NaCl,
+Heating limestone makes lime: CaCO₃ → CaO + CO₂. How many grams of CaO form from 1.00 kg of CaCO₃?,Stoichiometry,1.00 kg CaCO3,g CaO,1000 g CaCO3 / 1 kg CaCO3; 1 mol CaCO3 / 100.09 g CaCO3; 1 mol CaO / 1 mol CaCO3; 56.08 g CaO / 1 mol CaO,,CaCO3 -> CaO + CO2,
+Iron rusts: 4 Fe + 3 O₂ → 2 Fe₂O₃. How many grams of O₂ are needed to rust 5.00 g of iron?,Stoichiometry,5.00 g Fe,g O2,1 mol Fe / 55.85 g Fe; 3 mol O2 / 4 mol Fe; 32.00 g O2 / 1 mol O2,,4 Fe + 3 O2 -> 2 Fe2O3,
+Potassium chlorate decomposes: 2 KClO₃ → 2 KCl + 3 O₂. How many moles of O₂ form from 12.25 g of KClO₃?,Stoichiometry,12.25 g KClO3,mol O2,1 mol KClO3 / 122.55 g KClO3; 3 mol O2 / 2 mol KClO3,,2 KClO3 -> 2 KCl + 3 O2,
+"In respiration, C₆H₁₂O₆ + 6 O₂ → 6 CO₂ + 6 H₂O. How many grams of water form from 45.0 g of glucose?",Stoichiometry,45.0 g C6H12O6,g H2O,1 mol C6H12O6 / 180.16 g C6H12O6; 6 mol H2O / 1 mol C6H12O6; 18.02 g H2O / 1 mol H2O,,C6H12O6 + 6 O2 -> 6 CO2 + 6 H2O,
+"Zinc dissolves in acid: Zn + 2 HCl → ZnCl₂ + H₂. What volume, in mL, of 2.00 M HCl is needed to dissolve 3.27 g of zinc?",Stoichiometry,3.27 g Zn,mL solution,1 mol Zn / 65.38 g Zn; 2 mol HCl / 1 mol Zn; 1 L solution / 2.00 mol HCl; 1000 mL solution / 1 L solution,2.00 mol HCl = 1 L solution,Zn + 2 HCl -> ZnCl2 + H2,"After the mole ratio, use the molarity to turn moles of HCl into volume."
+Silver nitrate and sodium chloride form a precipitate: AgNO₃ + NaCl → AgCl + NaNO₃. What mass of AgCl precipitates from 50.0 mL of 0.100 M AgNO₃?,Stoichiometry,50.0 mL solution,g AgCl,1 L solution / 1000 mL solution; 0.100 mol AgNO3 / 1 L solution; 1 mol AgCl / 1 mol AgNO3; 143.32 g AgCl / 1 mol AgCl,0.100 mol AgNO3 = 1 L solution,AgNO3 + NaCl -> AgCl + NaNO3,
+Model gasoline as octane: 2 C₈H₁₈ + 25 O₂ → 16 CO₂ + 18 H₂O. Octane has a density of 0.703 g/mL. How many kilograms of CO₂ does burning 1.00 gal of octane produce?,Stoichiometry,1.00 gal C8H18,kg CO2,3.785 L C8H18 / 1 gal C8H18; 1000 mL C8H18 / 1 L C8H18; 0.703 g C8H18 / 1 mL C8H18; 1 mol C8H18 / 114.23 g C8H18; 16 mol CO2 / 2 mol C8H18; 44.01 g CO2 / 1 mol CO2; 1 kg CO2 / 1000 g CO2,0.703 g C8H18 = 1 mL C8H18,2 C8H18 + 25 O2 -> 16 CO2 + 18 H2O,Gallons → mL → grams (density) → moles → mole ratio → grams → kg.
+"In a blast furnace, Fe₂O₃ + 3 CO → 2 Fe + 3 CO₂. How many kilograms of iron can be made from 1.00 kg of Fe₂O₃?",Stoichiometry,1.00 kg Fe2O3,kg Fe,1000 g Fe2O3 / 1 kg Fe2O3; 1 mol Fe2O3 / 159.69 g Fe2O3; 2 mol Fe / 1 mol Fe2O3; 55.85 g Fe / 1 mol Fe; 1 kg Fe / 1000 g Fe,,Fe2O3 + 3 CO -> 2 Fe + 3 CO2,

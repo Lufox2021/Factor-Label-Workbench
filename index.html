@@ -126,6 +126,45 @@ select:focus-visible, input:focus-visible, textarea:focus-visible, button:focus-
 .pill.mine { background: var(--info-bg); color: var(--accent); }
 h2 { font: 700 1.15rem var(--f-display); font-stretch: 90%; margin: 8px 0 0; }
 .empty { color: var(--muted); font-style: italic; }
+/* reference drawer */
+.refbtn { align-self: center; margin-bottom: 10px; }
+.btn.inline { padding: 0 2px; font-size: inherit; vertical-align: baseline; }
+.ref { box-sizing: border-box; position: fixed; z-index: 30; top: 0; right: 0; bottom: 0; width: min(390px, 100%); background: var(--card); border-left: 1px solid var(--line);
+  box-shadow: -8px 0 24px rgba(0,0,0,.12); overflow-y: auto; overscroll-behavior: contain;
+  padding: calc(env(safe-area-inset-top, 0px) + 14px) max(18px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 24px) 18px; }
+.rhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; position: sticky; top: calc(-14px - env(safe-area-inset-top, 0px)); background: var(--card); padding-block: 6px; z-index: 1; }
+.rhead h3 { font: 700 1.1rem var(--f-display); font-stretch: 90%; margin: 0; }
+.rstatus { min-height: 1.3em; margin: 2px 0 8px; font-size: 0.86rem; color: var(--muted); }
+.rstatus.ok { color: var(--ok); }
+.rstatus.bad { color: var(--warn); }
+.ref details { border-top: 1px solid var(--line); padding-block: 8px; }
+.ref summary { cursor: pointer; font: 650 0.95rem var(--f-display); padding-block: 4px; }
+.ref p, .ref li { font-size: 0.9rem; }
+.ref code { font-family: var(--f-mono); font-size: 0.88em; background: var(--soft); padding: 0 4px; border-radius: 4px; }
+.rgroup { padding-block: 8px 4px; display: grid; gap: 6px; }
+.rgroup h4 { margin: 4px 0 0; font: 600 0.72rem var(--f-display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.chips .sys { font-size: 0.74rem; color: var(--muted); width: 4.6em; flex: none; }
+.chip { font: 500 0.88rem var(--f-mono); border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 5px; padding: 3px 8px; cursor: pointer; min-height: 30px; }
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chip:active { background: var(--info-bg); }
+.eqs { margin: 2px 0 0; padding-left: 18px; display: grid; gap: 2px; }
+.eqs li { font-family: var(--f-mono); font-size: 0.84rem; }
+.ref details:not(:first-of-type) .eqs li { font-family: var(--f-body); font-size: 0.88rem; }
+.xtag { font: 600 0.66rem var(--f-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ok); background: var(--ok-bg); padding: 1px 6px; border-radius: 99px; }
+.rnote { color: var(--muted); font-size: 0.84rem !important; margin: 2px 0; }
+.ptab { border-collapse: collapse; width: 100%; font-size: 0.86rem; margin-top: 6px; }
+.ptab th { text-align: left; font: 600 0.7rem var(--f-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 4px 6px; border-bottom: 1px solid var(--line); }
+.ptab td { padding: 3px 6px; border-bottom: 1px solid var(--soft); vertical-align: middle; }
+.ptab td:last-child { font-family: var(--f-mono); }
+.slips td:last-child, .slips td:first-child { font-family: inherit; }
+.readout { font: 400 0.88rem var(--f-mono); color: var(--muted); min-height: 1.4em; margin-top: 8px; }
+.readout.bad { color: var(--cancel); font-family: var(--f-body); }
+.readout b { color: var(--ink); }
+@media (min-width: 980px) { body.ref-open main.wrap, body.ref-open header .wrap { margin-right: 390px; margin-left: max(0px, calc((100% - 390px - 1080px) / 2)); } }
+@media (max-width: 640px) { .ref { top: auto; height: 62vh; height: 62dvh; width: 100%; border-left: 0; border-top: 1px solid var(--line); border-radius: 14px 14px 0 0;
+  box-shadow: 0 -8px 24px rgba(0,0,0,.18); padding-top: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .rhead { top: -8px; } body.ref-open main.wrap { padding-bottom: 62vh; } }
 .filebtn { position: relative; overflow: hidden; }
 .filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .filebtn:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -151,8 +190,17 @@ h2 { font: 700 1.15rem var(--f-display); font-stretch: 90%; margin: 8px 0 0; }
       <button role="tab" id="tab-calc" aria-selected="false" data-tab="calc">FL Calculator</button>
       <button role="tab" id="tab-bank" aria-selected="false" data-tab="bank" hidden>Problem Bank</button>
     </nav>
+    <button type="button" class="btn refbtn" id="ref-open" aria-expanded="false" aria-controls="ref">Units &amp; notation</button>
   </div>
 </header>
+<aside id="ref" class="ref" hidden aria-label="Units and notation">
+  <div class="rhead">
+    <h3>Units &amp; notation</h3>
+    <button type="button" class="btn quiet" id="ref-close" aria-label="Close units and notation">Close ✕</button>
+  </div>
+  <p id="ref-status" class="rstatus" role="status"></p>
+  <div id="ref-body"></div>
+</aside>
 <main class="wrap">
 
   <section class="panel" id="p-solve">
@@ -162,15 +210,7 @@ h2 { font: 700 1.15rem var(--f-display); font-stretch: 90%; margin: 8px 0 0; }
     </div>
     <div id="solve-problem"></div>
     <div id="solve-chain"></div>
-    <details class="help">
-      <summary>How to type units</summary>
-      <ul>
-        <li>Powers: <code>cm^3</code>, <code>cm3</code> or <code>cm³</code>. Rates: <code>mi/h</code>, <code>m/s^2</code>, <code>g/mL</code>.</li>
-        <li>Name the substance after the unit: <code>g NaCl</code>, <code>mol H2O</code>, <code>molecules CO2</code>, <code>L solution</code>.</li>
-        <li>Big and small numbers: <code>6.022e23</code> or <code>6.022x10^23</code>.</li>
-        <li>To raise a whole factor to a power (for squared or cubed units), use the small <code>^1</code> box in its corner. Leave it at 1 unless the units call for more.</li>
-      </ul>
-    </details>
+    <p class="help" style="margin:0">Not sure how to type a unit or a number? Open <button type="button" class="btn quiet inline" data-open-ref>Units &amp; notation</button>. To raise a whole factor to a power (for squared or cubed units), use the small <code>^1</code> box in its corner, and leave it at 1 unless the units call for more.</p>
   </section>
 
   <section class="panel" id="p-tutor" hidden>
@@ -258,10 +298,11 @@ const UE = (() => {
     m: { f: 1, d: Dm(1) }, g: { f: 1, d: Dm(0, 1) }, s: { f: 1, d: Dm(0, 0, 1) },
     L: { f: 1e-3, d: Dm(3) }, mol: { f: 1, d: Dm(0, 0, 0, 1) },
     J: { f: 1000, d: Dm(2, 1, -2) }, cal: { f: 4184, d: Dm(2, 1, -2) },
-    Pa: { f: 1000, d: Dm(-1, 1, -2) }, W: { f: 1000, d: Dm(2, 1, -3) }
+    Pa: { f: 1000, d: Dm(-1, 1, -2) }, W: { f: 1000, d: Dm(2, 1, -3) }, N: { f: 1000, d: Dm(1, 1, -2) }
   };
   const GAL = 3.785411784e-3;
   const OTHER = {
+    M: { f: 1000, d: Dm(-3, 0, 0, 1) }, mM: { f: 1, d: Dm(-3, 0, 0, 1) }, "μM": { f: 1e-3, d: Dm(-3, 0, 0, 1) },
     in: { f: 0.0254, d: Dm(1) }, ft: { f: 0.3048, d: Dm(1) }, yd: { f: 0.9144, d: Dm(1) },
     mi: { f: 1609.344, d: Dm(1) }, "Å": { f: 1e-10, d: Dm(1) },
     lb: { f: 453.59237, d: Dm(0, 1) }, oz: { f: 28.349523125, d: Dm(0, 1) },
@@ -290,7 +331,7 @@ const UE = (() => {
     pint: "pt", pints: "pt", cups: "cup", "fl-oz": "floz", "fl.oz": "floz", Torr: "torr",
     "mm-Hg": "mmHg", u: "amu", Da: "amu", A: "Å", angstrom: "Å",
     atom: "atoms", molecule: "molecules", ion: "ions", particle: "particles", fu: "formula units",
-    l: "L", ml: "mL", dl: "dL", cl: "cL", kl: "kL", ul: "μL", "μl": "μL", "µl": "μL",
+    uM: "μM", "µM": "μM", l: "L", ml: "mL", dl: "dL", cl: "cL", kl: "kL", ul: "μL", "μl": "μL", "µl": "μL",
     moles: "mol", mole: "mol", grams: "g", gram: "g", meter: "m", meters: "m", liter: "L", liters: "L"
   };
   const PREFIX = [["da", 10], ["T", 1e12], ["G", 1e9], ["M", 1e6], ["k", 1e3], ["h", 1e2], ["d", 0.1],
@@ -386,10 +427,31 @@ const UE = (() => {
     if (str == null) return NaN;
     let s = String(str).trim().replace(/,/g, "").replace(/−/g, "-");
     if (!s) return NaN;
-    s = s.replace(/\s*[x×*·]\s*10\s*\^\s*\(?\s*([+-]?\d+)\s*\)?/i, "e$1")
+    s = s.replace(/^([+-]?)10\s*\^\s*\(?\s*([+-]?\d+)\s*\)?$/, "$11e$2")
+         .replace(/^([+-]?)10([⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)$/, (m, sg, sup) => sg + "1e" + fromSup(sup))
+         .replace(/(\d|\.)\s*e\s*([+-]?\d)/i, "$1e$2")
+         .replace(/\s*[x×*·]\s*10\s*\^\s*\(?\s*([+-]?\d+)\s*\)?/i, "e$1")
          .replace(/\s*[x×*·]\s*10([⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)/, (m, sup) => "e" + fromSup(sup));
     if (!/^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.test(s)) return NaN;
     return parseFloat(s);
+  }
+  function numHelp(raw) {
+    const s = String(raw ?? "").trim().replace(/−/g, "-");
+    if (!s) return { empty: true };
+    const v = parseNum(s);
+    if (isFinite(v)) return { value: v };
+    let m;
+    if ((m = s.match(/^([+-]?[\d.]+)\s*\^\s*\(?\s*([+-]?\d+)\s*\)?$/)))
+      return { msg: `“${s}” means ${m[1]} to the power of ${m[2]}. For scientific notation, type ${m[1]}e${m[2]} (or ${m[1]}x10^${m[2]}).` };
+    if ((m = s.match(/^([+-]?[\d.]+)\s*[x×*·]\s*10\s+([+-]?\d+)$/)))
+      return { msg: `Put ^ before the exponent: ${m[1]}x10^${m[2]}, or just ${m[1]}e${m[2]}.` };
+    if ((m = s.match(/^([+-]?[\d.]+)\s*[x×*·]\s*10\s*\^?$/)))
+      return { msg: `Add the exponent after 10^, as in ${m[1]}x10^23.` };
+    if ((m = s.match(/^([+-]?[\d.]+)\s*e\s*$/i)))
+      return { msg: `Add the exponent after the e, as in ${m[1]}e23.` };
+    if (/\d*\.\d*\./.test(s)) return { msg: "That number has more than one decimal point." };
+    if (/[a-df-wyz]/i.test(s)) return { msg: "Type only the number here. The unit goes in its own box." };
+    return { msg: "That isn't a number the tool can read. Examples: 1609, 0.0254, 6.022e23, 6.022x10^23." };
   }
   const SUP = { "⁻": "-", "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9" };
   const fromSup = (s) => [...s].map(c => SUP[c] ?? c).join("");
@@ -529,11 +591,12 @@ const UE = (() => {
     return { a, b, text: line.trim() };
   }
   function parseQty(str) {
-    const s = String(str || "").trim();
-    const m = s.match(/^([+-]?[\d.,]+(?:\s*(?:e|[x×*·]\s*10\s*\^?)\s*[+-]?\d+|\s*[x×*·]\s*10[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)?)\s*(.*)$/i);
+    const s = String(str || "").trim().replace(/−/g, "-");
+    const m = s.match(/^(10\s*\^\s*\(?\s*[+-]?\d+\s*\)?|10[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+|[+-]?[\d.,]+(?:\s*e\s*[+-]?\d+|\s*[x×*·]\s*10\s*\^?\s*\(?\s*[+-]?\d+\s*\)?|\s*[x×*·]\s*10[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+|\s*\^\s*[+-]?\d+)?)\s*(.*)$/i);
     if (!m) return { error: "Start with a number, like 3.75 lb." };
     const v = parseNum(m[1]);
-    if (!isFinite(v)) return { error: "That number isn't readable." };
+    if (!isFinite(v)) return { error: numHelp(m[1]).msg || "That number isn't readable." };
+    if (/^[x×]\s*10\b/i.test(m[2])) return { error: "Add the exponent after 10^, as in 6.022x10^23." };
     const u = parseExpr(m[2]);
     if (u.error) return { error: u.error };
     return { value: v, map: u.map, unitStr: m[2].trim() };
@@ -586,7 +649,7 @@ const UE = (() => {
     return ctx;
   }
 
-  return { parseExpr, parseQty, parseNum, parseRelation, parseEquation, molarMass, mulMap, eqMap, mapText, unitText,
+  return { parseExpr, parseQty, parseNum, numHelp, parseRelation, parseEquation, molarMass, mulMap, eqMap, mapText, unitText,
     keyOf, checkFactor, equivalence, makeCtx, fmt, toSup, siOf, lookup };
 })();
 if (typeof module !== "undefined") module.exports = UE;
@@ -697,12 +760,41 @@ class Chain {
   onInput(e) {
     const t = e.target, k = t.dataset.k;
     if (!k) return;
-    if (k === "start") { this.start = t.value; this.dirty(); return; }
+    if (k === "start") { this.start = t.value; this.dirty(); this.readout(t); return; }
     if (k === "target") { this.target = t.value; this.dirty(); return; }
     const f = this.factors[+t.dataset.i];
     f[k] = t.value;
+    if (k === "nv" || k === "dv") this.readout(t);
     if (k === "nv" || k === "dv") { f.check = null; f.reveal = false; const box = t.closest(".factor"); box && box.classList.remove("ok", "bad", "unknown"); }
     this.dirty();
+  }
+  readout(t) {
+    const out = this.el.querySelector(".readout");
+    if (!out) return;
+    const k = t.dataset.k, v = t.value;
+    out.className = "readout";
+    if (!v.trim()) { out.textContent = ""; return; }
+    if (k === "start") {
+      const q = UE.parseQty(v);
+      if (q.error) { out.className = "readout bad"; out.textContent = "Start: " + q.error; return; }
+      out.innerHTML = `Reading the start as <b>${esc(UE.fmt(q.value, 6))} ${esc(UE.mapText(q.map))}</b>`;
+      return;
+    }
+    const where = `Factor ${+t.dataset.i + 1}, ${k === "nv" ? "top" : "bottom"} number`;
+    const h = UE.numHelp(v);
+    if (h.msg) { out.className = "readout bad"; out.textContent = `${where}: ${h.msg}`; return; }
+    out.innerHTML = `${where}: <b>${esc(UE.fmt(h.value, 6))}</b>`;
+  }
+  numProblems(idx) {
+    const out = [];
+    for (const i of idx) {
+      const f = this.factors[i];
+      for (const [k, side] of [["nv", "top"], ["dv", "bottom"]]) {
+        const h = UE.numHelp(f[k]);
+        if (h.msg) out.push({ type: "bad", html: `Factor ${i + 1}, ${side} number: ${esc(h.msg)}` });
+      }
+    }
+    return out;
   }
   onChange(e) {
     const t = e.target;
@@ -809,6 +901,8 @@ class Chain {
   }
   checkNumbers() {
     this.msgs = []; this.result = null;
+    const np = this.numProblems(this.factors.map((_, i) => i));
+    if (np.length) { this.msgs = np; return this.render(); }
     const ctx = this.ctx;
     const s = UE.parseQty(this.start);
     let v = s.value, missing = [], bad = [], unknown = [];
@@ -873,6 +967,8 @@ class Chain {
   tutorValues() {
     const i = this.factors.length - 1, f = this.cur();
     this.msgs = [];
+    const np = this.numProblems([i]);
+    if (np.length) { this.msgs = np; return this.render(); }
     const p = parseFactor(f);
     const nv = UE.parseNum(f.nv), dv = UE.parseNum(f.dv);
     f.check = UE.checkFactor(p.numMap, nv, p.denMap, dv, this.ctx);
@@ -977,6 +1073,8 @@ class Chain {
     const r = this.running(this.factors.length);
     if (r.error) { this.msgs.push({ type: "bad", html: esc(r.error) }); return this.render(); }
     if (!UE.eqMap(r.map, tm.map)) { this.msgs.push(...this.diagnose(s.map, tm.map, r.map)); return this.render(); }
+    const np = this.numProblems(this.factors.map((_, i) => i));
+    if (np.length) { this.msgs = np; return this.render(); }
     const ctx = this.ctx; let v = s.value, bad = [], unknown = [], empty = [];
     this.factors.forEach((f, i) => {
       const p = parseFactor(f), nv = UE.parseNum(f.nv), dv = UE.parseNum(f.dv);
@@ -1096,7 +1194,7 @@ class Chain {
       a = `<button class="btn primary" data-act="verify">Verify solution</button>`;
     }
     const msgs = this.msgs.map(m => `<div class="msg ${m.type}" role="status">${m.html}</div>`).join("");
-    this.el.innerHTML = `<div class="chain">${h}</div><div class="bar" style="margin-top:12px">${a}</div><div class="msgs" style="margin-top:12px">${msgs}</div>`;
+    this.el.innerHTML = `<div class="chain">${h}</div><div class="readout" aria-live="polite"></div><div class="bar" style="margin-top:8px">${a}</div><div class="msgs" style="margin-top:12px">${msgs}</div>`;
   }
 }
 
@@ -1488,6 +1586,163 @@ function templateCSV() {
     catch (e) { if (e && e.code !== "declined") $("#u-status").textContent = "The template couldn't be downloaded here."; }
   });
 })();
+/* ---------- GitHub Pages: load problems.csv from the repository ---------- */
+(async () => {
+  const cl = window.claude;
+  if (cl && cl.use) { const db = await cl.use("db"); if (db) return; } // the live problem bank is in use
+  let text;
+  try {
+    const r = await fetch("problems.csv", { cache: "no-cache" });
+    if (!r.ok) return;
+    text = await r.text();
+  } catch (_) { return; }
+  const res = rowsToProblems(parseCSV(text));
+  if (res.error) { showLoadNote(`problems.csv couldn't be read: ${res.error}`); return; }
+  const good = res.problems.filter(p => !p.errors.length && !p.dup);
+  store.saved = good.map((p, i) => ({ ...p, id: "csv" + (i + 1), createdAt: i }));
+  onProblemsChange();
+  const skipped = res.problems.filter(p => p.errors.length);
+  if (skipped.length) showLoadNote(`${skipped.length} row${skipped.length > 1 ? "s" : ""} in problems.csv had errors and ${skipped.length > 1 ? "were" : "was"} skipped: ` +
+    skipped.map(p => `row ${p.row} (${p.errors[0]})`).join("; "));
+})();
+function showLoadNote(msg) {
+  const p = document.createElement("p");
+  p.className = "help wrap"; p.style.paddingBlock = "0 32px";
+  p.textContent = msg;
+  document.body.appendChild(p);
+}
+/* ---------- Units & Notation reference panel ---------- */
+const REF_UNITS = [
+  { q: "Length",
+    metric: [["m", "meter"], ["km", "kilometer"], ["cm", "centimeter"], ["mm", "millimeter"], ["μm", "micrometer"], ["nm", "nanometer"], ["pm", "picometer"], ["Å", "angstrom"]],
+    english: [["in", "inch"], ["ft", "foot"], ["yd", "yard"], ["mi", "mile"]],
+    eq: [["1 km = 1000 m"], ["1 m = 100 cm"], ["1 cm = 10 mm"], ["1 m = 1e6 μm"], ["1 m = 1e9 nm"], ["1 m = 1e12 pm"], ["1 Å = 1e-10 m"],
+      ["1 in = 2.54 cm", "exact"], ["1 ft = 12 in"], ["1 yd = 3 ft"], ["1 mi = 5280 ft"], ["1 mi = 1609 m"]] },
+  { q: "Mass",
+    metric: [["g", "gram"], ["kg", "kilogram"], ["mg", "milligram"], ["μg", "microgram"], ["ng", "nanogram"], ["t", "metric ton"]],
+    english: [["oz", "ounce"], ["lb", "pound"], ["ton", "short ton"]], other: [["amu", "atomic mass unit"]],
+    eq: [["1 kg = 1000 g"], ["1 g = 1000 mg"], ["1 g = 1e6 μg"], ["1 t = 1000 kg"], ["1 lb = 16 oz"], ["1 lb = 453.6 g"], ["1 oz = 28.35 g"],
+      ["1 kg = 2.205 lb"], ["1 ton = 2000 lb"], ["1 amu = 1.6605e-24 g"]] },
+  { q: "Volume",
+    metric: [["L", "liter"], ["mL", "milliliter"], ["μL", "microliter"], ["dL", "deciliter"], ["cm³", "cubic centimeter"], ["m³", "cubic meter"], ["cc", "cubic centimeter"]],
+    english: [["tsp", "teaspoon"], ["tbsp", "tablespoon"], ["fl oz", "fluid ounce"], ["cup", "cup"], ["pt", "pint"], ["qt", "quart"], ["gal", "gallon"], ["in³", "cubic inch"], ["ft³", "cubic foot"]],
+    eq: [["1 L = 1000 mL"], ["1 mL = 1 cm^3", "exact"], ["1 L = 10 dL"], ["1 m^3 = 1000 L"], ["1 gal = 4 qt"], ["1 qt = 2 pt"], ["1 pt = 2 cup"],
+      ["1 cup = 8 fl oz"], ["1 fl oz = 2 tbsp"], ["1 tbsp = 3 tsp"], ["1 gal = 3.785 L"], ["1 qt = 946.4 mL"], ["1 fl oz = 29.57 mL"]] },
+  { q: "Time",
+    metric: [["s", "second"], ["ms", "millisecond"], ["μs", "microsecond"], ["ns", "nanosecond"]],
+    english: [["min", "minute"], ["h", "hour"], ["day", "day"], ["wk", "week"], ["yr", "year"]],
+    eq: [["1 s = 1000 ms"], ["1 min = 60 s"], ["1 h = 60 min"], ["1 day = 24 h"], ["1 wk = 7 day"], ["1 yr = 365 day"]] },
+  { q: "Pressure",
+    metric: [["Pa", "pascal"], ["kPa", "kilopascal"], ["hPa", "hectopascal"], ["MPa", "megapascal"], ["bar", "bar"]],
+    english: [["atm", "atmosphere"], ["torr", "torr"], ["mmHg", "millimeters of mercury"], ["psi", "pounds per square inch"]],
+    eq: [["1 atm = 101325 Pa"], ["1 atm = 101.3 kPa"], ["1 atm = 760 mmHg"], ["1 atm = 760 torr"], ["1 mmHg = 1 torr"], ["1 atm = 14.70 psi"],
+      ["1 bar = 1e5 Pa"], ["1 hPa = 100 Pa"]] },
+  { q: "Energy",
+    metric: [["J", "joule"], ["kJ", "kilojoule"], ["cal", "calorie"], ["kcal", "kilocalorie"]],
+    english: [["Cal", "food Calorie (= 1 kcal)"]],
+    eq: [["1 kJ = 1000 J"], ["1 cal = 4.184 J", "exact"], ["1 kcal = 1000 cal"], ["1 Cal = 1 kcal"], ["1 Cal = 4.184 kJ"]] },
+  { q: "Force",
+    metric: [["N", "newton"], ["kN", "kilonewton"]], english: [],
+    eq: [["1 kN = 1000 N"], ["1 N = 1 kg m/s^2"]] },
+  { q: "Amount & concentration",
+    metric: [["mol", "mole"], ["mmol", "millimole"], ["M", "molar (mol/L)"], ["mM", "millimolar"]],
+    english: [], other: [["atoms", "atoms"], ["molecules", "molecules"], ["ions", "ions"], ["formula units", "formula units"]],
+    eq: [["1 mol = 1000 mmol"], ["1 M = 1 mol/L"], ["1 M = 1000 mM"], ["1 mol Fe = 6.022e23 atoms Fe"], ["1 mol H2O = 6.022e23 molecules H2O"],
+      ["1 mol NaCl = 58.44 g NaCl", "molar mass"]],
+    note: "Molar masses come from the formula you type, so 1 mol H2O = 18.02 g H2O is checked automatically. For solution problems, mol NaCl / L solution is clearer than M." }
+];
+const REF_PREFIX = [["T", "tera", 12], ["G", "giga", 9], ["M", "mega", 6], ["k", "kilo", 3], ["h", "hecto", 2], ["da", "deka", 1],
+  ["d", "deci", -1], ["c", "centi", -2], ["m", "milli", -3], ["μ", "micro", -6], ["n", "nano", -9], ["p", "pico", -12], ["f", "femto", -15]];
+const REF_SYMBOLS = [["/", "per (divide)"], ["²", "squared"], ["³", "cubed"], ["μ", "micro"]];
+
+function prettyUnits(s) {
+  return s.replace(/\^(-?\d)/g, (m, d) => UE.toSup(d)).replace(/(\d(?:\.\d+)?)e(-?\d+)/g, (m, a, b) => (a === "1" ? "" : `${a} × `) + `10${UE.toSup(b)}`);
+}
+function prettyNumber(s) { return s.replace(/\b(\d{5,})\b/g, (m) => Number(m).toLocaleString("en-US")); }
+
+function buildRef() {
+  const chip = ([sym, name]) => `<button type="button" class="chip" data-sym="${esc(sym)}" title="${esc(name)}">${esc(sym)}</button>`;
+  const units = REF_UNITS.map(g => `
+    <div class="rgroup">
+      <h4>${esc(g.q)}</h4>
+      <div class="chips"><span class="sys">Metric</span>${g.metric.map(chip).join("")}</div>
+      ${g.english.length ? `<div class="chips"><span class="sys">English</span>${g.english.map(chip).join("")}</div>` : ""}
+      ${g.other ? `<div class="chips"><span class="sys">Other</span>${g.other.map(chip).join("")}</div>` : ""}
+      <ul class="eqs">${g.eq.map(([t, tag]) => `<li>${esc(prettyNumber(prettyUnits(t)))}${tag ? ` <span class="xtag">${esc(tag)}</span>` : ""}</li>`).join("")}</ul>
+      ${g.note ? `<p class="rnote">${esc(g.note)}</p>` : ""}
+    </div>`).join("");
+  const prefixes = `<table class="ptab"><thead><tr><th>Prefix</th><th>Symbol</th><th>Factor</th></tr></thead><tbody>${REF_PREFIX.map(([s, n, e]) =>
+    `<tr><td>${n}</td><td><button type="button" class="chip" data-sym="${s}" title="${n}- (put it right before the unit)">${s}</button></td><td>10${UE.toSup(e)}</td></tr>`).join("")}</tbody></table>
+    <p class="rnote">A prefix goes directly in front of the unit with no space: km, mg, μL, kPa. It works on m, g, L, s, J, cal, Pa, N and mol.</p>`;
+  $("#ref-body").innerHTML = `
+    <p class="rnote" id="ref-how">Tap a unit to add it to the unit box you were typing in. Every relationship listed here is one the tool checks.</p>
+    <div class="chips"><span class="sys">Symbols</span>${REF_SYMBOLS.map(chip).join("")}</div>
+    <details open><summary>Units</summary>${units}</details>
+    <details><summary>Metric prefixes</summary>${prefixes}</details>
+    <details open><summary>Typing numbers &amp; scientific notation</summary>
+      <p>Type <code>6.022e23</code> for 6.022 × 10²³. The <b>e</b> means “times ten to the.” Use a minus sign for small numbers: <code>1.6e-19</code> is 1.6 × 10⁻¹⁹.</p>
+      <p>These also work: <code>6.022x10^23</code>, <code>6.022*10^23</code>, <code>6.022E23</code> (as most calculators show it), and <code>10^-3</code> for 10⁻³.</p>
+      <table class="ptab slips"><thead><tr><th>If you type</th><th>The tool reads</th><th>Type instead</th></tr></thead><tbody>
+        <tr><td><code>6.022^23</code></td><td>6.022 to the power of 23</td><td><code>6.022e23</code></td></tr>
+        <tr><td><code>6.022 x 10 23</code></td><td>nothing (no ^)</td><td><code>6.022x10^23</code></td></tr>
+        <tr><td><code>6.022 x 10</code></td><td>nothing (no exponent)</td><td><code>6.022x10^23</code></td></tr>
+        <tr><td><code>2.54 cm</code> in a number box</td><td>nothing (unit in a number box)</td><td><code>2.54</code></td></tr>
+      </tbody></table>
+      <p>As you type a number, the line under the chain shows how the tool read it, so you can catch a mistake before you check.</p>
+    </details>
+    <details><summary>Watch out for</summary>
+      <ul class="eqs">
+        <li><b>Capital letters matter.</b> mL is milliliter, ML would be megaliter. mm is millimeter, Mm is megameter. Cal is a food Calorie (1000 cal).</li>
+        <li><b>Typing μ.</b> Use the μ button, or type the letter u: <code>um</code>, <code>ug</code>, <code>uL</code>.</li>
+        <li><b>Powers.</b> <code>cm^3</code>, <code>cm3</code> and <code>cm³</code> all mean cubic centimeters.</li>
+        <li><b>Substances.</b> Put the formula after the unit, with a space: <code>g NaCl</code>, <code>mol H2O</code>, <code>L solution</code>.</li>
+        <li><b>Temperature</b> (°C, °F, K) isn't in this tool. Changing temperature units means adding or subtracting, not just multiplying, so it doesn't work as a conversion factor.</li>
+      </ul>
+    </details>`;
+}
+
+let refField = null, refWasNumber = false;
+const UNIT_FIELD = 'input[data-k="num"], input[data-k="den"], input[data-k="start"], input[data-k="target"], #calc-given, #b-given';
+document.addEventListener("focusin", (e) => {
+  const t = e.target;
+  if (!(t instanceof HTMLElement) || t.closest("#ref")) return;
+  if (t.matches(UNIT_FIELD)) { refField = t.id; refWasNumber = false; }
+  else if (t.matches('input[data-k="nv"], input[data-k="dv"]')) { refField = null; refWasNumber = true; }
+});
+function refStatus(msg, kind) { const s = $("#ref-status"); s.textContent = msg; s.className = "rstatus" + (kind ? " " + kind : ""); }
+function insertSym(sym) {
+  const el = refField && document.getElementById(refField);
+  if (!el || el.offsetParent === null || el.disabled) {
+    refStatus(refWasNumber ? "That's a number box. Tap a unit box (top or bottom of a factor, start, or target), then tap a unit." : "Tap a unit box first, then tap a unit to add it.", "bad");
+    return;
+  }
+  const v = el.value, a = el.selectionStart ?? v.length, b = el.selectionEnd ?? v.length;
+  const before = v.slice(0, a);
+  let ins = sym;
+  const glue = /^[²³\/]$/.test(sym) || (REF_PREFIX.some(p => p[0] === sym) && sym !== "M");
+  if (!glue && before && !/[\s\/(]$/.test(before)) ins = " " + ins;
+  el.value = before + ins + v.slice(b);
+  const caret = a + ins.length;
+  el.focus({ preventScroll: true });
+  try { el.setSelectionRange(caret, caret); } catch (_) {}
+  el.dispatchEvent(new Event("input", { bubbles: true }));
+  refStatus(`Added ${sym} to ${el.getAttribute("aria-label") || "the box"}.`, "ok");
+}
+function openRef(open) {
+  const r = $("#ref");
+  r.hidden = !open;
+  document.body.classList.toggle("ref-open", open);
+  $("#ref-open").setAttribute("aria-expanded", String(open));
+  if (open) refStatus(refField ? "" : "Tap a unit box first, then tap a unit to add it.");
+}
+buildRef();
+$("#ref-open").addEventListener("click", () => openRef($("#ref").hidden));
+$("#ref-close").addEventListener("click", () => openRef(false));
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#ref").hidden) openRef(false); });
+document.addEventListener("click", (e) => { const b = e.target.closest("[data-open-ref]"); if (b) openRef(true); });
+const refBody = $("#ref");
+refBody.addEventListener("mousedown", (e) => { if (e.target.closest(".chip")) e.preventDefault(); });
+refBody.addEventListener("click", (e) => { const c = e.target.closest(".chip"); if (c) insertSym(c.dataset.sym); });
 </script>
 </body>
 </html>
